@@ -1,4 +1,4 @@
-import { createImageLinks } from '#common/helpers'
+import { createImageLinks, decodeEntities } from '#common/helpers'
 import { createArtistMapPayload } from '#modules/artists/helpers'
 import { createSongPayload } from '#modules/songs/helpers'
 import type { AlbumAPIResponseModel, AlbumModel } from '#modules/albums/models'
@@ -6,8 +6,8 @@ import type { z } from 'zod'
 
 export const createAlbumPayload = (album: z.infer<typeof AlbumAPIResponseModel>): z.infer<typeof AlbumModel> => ({
   id: album.id,
-  name: album.title,
-  description: album.header_desc,
+  name: decodeEntities(album.title),
+  description: decodeEntities(album.header_desc),
   type: album.type,
   year: album.year ? Number(album.year) : null,
   playCount: album.play_count ? Number(album.play_count) : null,
