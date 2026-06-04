@@ -3,7 +3,7 @@ import { config } from '@kolhe/eslint-config'
 export default config(
   [
     {
-      files: ['src/**/*.ts'],
+      files: ['src/**/*.ts', '*.config.ts'],
       rules: {
         'import/no-default-export': 'off'
       }

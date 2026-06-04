@@ -1,33 +1,26 @@
-FROM oven/bun AS base
+FROM node:20-alpine AS build
 
-WORKDIR /user/app
+RUN corepack enable
 
-COPY package.json .
+WORKDIR /app
 
-COPY bun.lockb .
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN bun install --frozen-lockfile --production
-
-# Making build file
-FROM base AS build
-
-WORKDIR /user/app
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY . .
 
-RUN bun install --frozen-lockfile
+RUN pnpm build
 
-RUN bun run build
+# Production image — Nitro bundles dependencies into .output, so nothing else is needed
+FROM node:20-alpine AS production
 
-# Production
-FROM oven/bun:alpine AS production
+WORKDIR /app
 
-WORKDIR /user/app
+ENV NODE_ENV=production
 
-COPY --from=build /user/app/dist ./dist
-COPY --from=base /user/app/node_modules ./node_modules
-COPY --from=base /user/app/package.json ./package.json
+COPY --from=build /app/.output ./.output
 
 EXPOSE 3000
 
-CMD ["bun", "run", "start"]
+CMD ["node", ".output/server/index.mjs"]

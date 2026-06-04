@@ -104,3 +104,8 @@ dist
 .tern-port
 .vercel
 *.DS_Store
+
+# Nitro
+.output
+.nitro
+.wrangler
