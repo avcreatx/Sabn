@@ -1,4 +1,5 @@
 import { createImageLinks } from '#common/helpers'
+import { safeJsonParse } from '#common/utils'
 import { createAlbumPayload } from '#modules/albums/album.helper'
 import { createSongPayload } from '#modules/songs/song.helper'
 import type {
@@ -19,7 +20,7 @@ export const createArtistPayload = (artist: z.infer<typeof ArtistAPIResponseMode
   isVerified: artist.isVerified || null,
   dominantLanguage: artist.dominantLanguage || null,
   dominantType: artist.dominantType || null,
-  bio: artist.bio ? JSON.parse(artist.bio) : null,
+  bio: safeJsonParse(artist.bio),
   dob: artist.dob || null,
   fb: artist.fb || null,
   twitter: artist.twitter || null,
@@ -36,7 +37,7 @@ export const createArtistPayload = (artist: z.infer<typeof ArtistAPIResponseMode
       name: similarArtist.name,
       url: similarArtist.perma_url,
       image: createImageLinks(similarArtist.image_url),
-      languages: similarArtist.languages ? JSON.parse(similarArtist.languages) : null,
+      languages: safeJsonParse(similarArtist.languages),
       wiki: similarArtist.wiki,
       dob: similarArtist.dob,
       fb: similarArtist.fb,
@@ -45,8 +46,8 @@ export const createArtistPayload = (artist: z.infer<typeof ArtistAPIResponseMode
       type: similarArtist.type,
       dominantType: similarArtist.dominantType,
       aka: similarArtist.aka,
-      bio: similarArtist.bio ? JSON.parse(similarArtist.bio) : null,
-      similarArtists: similarArtist.similar ? JSON.parse(similarArtist.similar) : null
+      bio: safeJsonParse(similarArtist.bio),
+      similarArtists: safeJsonParse(similarArtist.similar)
     })) || null
 })
 

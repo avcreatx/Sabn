@@ -1,137 +1,151 @@
 import { createImageLinks } from '#common/helpers'
-import { createArtistMapPayload } from '#modules/artists/artist.helper'
+import type { AlbumSummary, ArtistSummary, EntityCard, PlaylistSummary, SongSummary } from '#common/models'
 import type {
   SearchAlbumAPIResponseModel,
-  SearchAlbumModel,
   SearchAPIResponseModel,
-  SearchModel,
+  SearchArtistAPIResponseModel,
   SearchPlaylistAPIResponseModel,
-  SearchPlaylistModel
+  SearchResultModel
 } from '#modules/search/models'
 import type { z } from 'zod'
 
-export const createSearchPayload = (search: z.infer<typeof SearchAPIResponseModel>): z.infer<typeof SearchModel> => ({
-  topQuery: {
-    results: search?.topquery?.data.map((item) => {
-      return {
-        id: item?.id,
-        title: item?.title,
-        image: createImageLinks(item?.image),
-        album: item?.more_info?.album,
-        url: item?.perma_url,
-        type: item?.type,
-        language: item?.more_info?.language,
-        description: item?.description,
-        primaryArtists: item?.more_info?.primary_artists,
-        singers: item?.more_info?.singers
-      }
-    }),
-    position: search?.topquery?.position
-  },
+const num = (v?: string) => (v != null && v !== '' ? Number(v) : null)
+const str = (v?: string | null) => (v != null && v !== '' ? v : null)
+const isExplicit = (v?: string) => v === '1'
 
-  songs: {
-    results: search?.songs?.data.map((song) => {
-      return {
-        id: song?.id,
-        title: song?.title,
-        image: createImageLinks(song?.image),
-        album: song?.more_info.album,
-        url: song?.perma_url,
-        type: song?.type,
-        description: song?.description,
-        primaryArtists: song?.more_info?.primary_artists,
-        singers: song?.more_info?.singers,
-        language: song?.more_info?.language
-      }
-    }),
-    position: search.songs.position
-  },
+type AlbumResult = z.infer<typeof SearchAlbumAPIResponseModel>['results'][number]
+type ArtistResult = z.infer<typeof SearchArtistAPIResponseModel>['results'][number]
+type PlaylistResult = z.infer<typeof SearchPlaylistAPIResponseModel>['results'][number]
+type TopQueryItem = z.infer<typeof SearchAPIResponseModel>['topquery']['data'][number]
 
-  albums: {
-    results: search?.albums?.data.map((album) => {
-      return {
-        id: album?.id,
-        title: album?.title,
-        image: createImageLinks(album.image),
-        artist: album?.more_info.music,
-        url: album?.perma_url,
-        type: album?.type,
-        description: album?.description,
-        year: album?.more_info?.year,
-        songIds: album?.more_info?.song_pids,
-        language: album?.more_info?.language
-      }
-    }),
-    position: search?.albums?.position
-  },
+// ---- per-type search results → summaries ----
 
-  artists: {
-    results: search?.artists?.data.map((artist) => {
-      return {
-        id: artist?.id,
-        title: artist?.title,
-        image: createImageLinks(artist?.image),
-        type: artist?.type,
-        description: artist?.description,
-        position: artist?.position
-      }
-    }),
-    position: search?.artists?.position
-  },
+export const albumResultToSummary = (i: AlbumResult): AlbumSummary => ({
+  type: 'album',
+  id: i.id,
+  name: i.title,
+  url: i.perma_url,
+  image: createImageLinks(i.image),
+  artist: str(i.more_info?.music),
+  year: str(i.year),
+  songCount: num(i.more_info?.song_count),
+  language: str(i.language),
+  explicitContent: isExplicit(i.explicit_content)
+})
 
-  playlists: {
-    results: search?.playlists?.data.map((playlist) => {
+export const artistResultToSummary = (i: ArtistResult): ArtistSummary => ({
+  type: 'artist',
+  id: i.id,
+  name: i.name,
+  url: i.perma_url,
+  image: createImageLinks(i.image),
+  role: str(i.role)
+})
+
+export const playlistResultToSummary = (i: PlaylistResult): PlaylistSummary => ({
+  type: 'playlist',
+  id: i.id,
+  name: i.title,
+  url: i.perma_url,
+  image: createImageLinks(i.image),
+  songCount: num(i.more_info?.song_count),
+  followerCount: null,
+  language: str(i.more_info?.language),
+  explicitContent: isExplicit(i.explicit_content)
+})
+
+// ---- global search (autocomplete) → grouped summaries + top cards ----
+
+const topQueryToCard = (i: TopQueryItem): EntityCard | null => {
+  const card = { id: i.id, name: i.title, url: i.perma_url ?? '', image: createImageLinks(i.image) }
+  switch (i.type) {
+    case 'song':
       return {
-        id: playlist?.id,
-        title: playlist?.title,
-        image: createImageLinks(playlist.image),
-        url: playlist?.perma_url,
-        type: playlist?.type,
-        language: playlist?.more_info?.language,
-        description: playlist?.description
+        type: 'song',
+        ...card,
+        album: str(i.more_info?.album),
+        artists: str(i.more_info?.primary_artists),
+        language: str(i.more_info?.language),
+        explicitContent: isExplicit(i.explicit_content)
       }
-    }),
-    position: search?.playlists?.position
+    case 'album':
+      return {
+        type: 'album',
+        ...card,
+        artist: null,
+        year: null,
+        songCount: null,
+        language: str(i.more_info?.language),
+        explicitContent: isExplicit(i.explicit_content)
+      }
+    case 'artist':
+      return { type: 'artist', ...card, role: null }
+    case 'playlist':
+      return {
+        type: 'playlist',
+        ...card,
+        songCount: null,
+        followerCount: null,
+        language: str(i.more_info?.language),
+        explicitContent: isExplicit(i.explicit_content)
+      }
+    default:
+      return null
   }
-})
+}
 
-export const createSearchPlaylistPayload = (
-  playlist: z.infer<typeof SearchPlaylistAPIResponseModel>
-): z.infer<typeof SearchPlaylistModel> => ({
-  total: Number(playlist.total),
-  start: Number(playlist.start),
-  results: playlist.results.map((item) => ({
-    id: item.id,
-    name: item.title,
-    type: item.type,
-    image: createImageLinks(item.image),
-    url: item.perma_url,
-    songCount: item.more_info.song_count ? Number(item.more_info.song_count) : null,
-    language: item.more_info.language,
-    explicitContent: item.explicit_content === '1'
-  }))
-})
-
-export const createSearchAlbumPayload = (
-  album: z.infer<typeof SearchAlbumAPIResponseModel>
-): z.infer<typeof SearchAlbumModel> => ({
-  total: Number(album.total),
-  start: Number(album.start),
-  results: album.results.map((item) => ({
-    id: item.id,
-    name: item.title,
-    description: item.header_desc,
-    url: item.perma_url,
-    year: item.year ? Number(item.year) : null,
-    type: item.type,
-    playCount: item.play_count ? Number(item.play_count) : null,
-    language: item.language,
-    explicitContent: item.explicit_content === '1',
-    artists: {
-      primary: item.more_info?.artistMap?.primary_artists?.map(createArtistMapPayload),
-      featured: item.more_info?.artistMap?.featured_artists?.map(createArtistMapPayload),
-      all: item.more_info?.artistMap?.artists?.map(createArtistMapPayload)
-    },
-    image: createImageLinks(item.image)
-  }))
+export const createSearchPayload = (
+  data: z.infer<typeof SearchAPIResponseModel>
+): z.infer<typeof SearchResultModel> => ({
+  topQuery: data.topquery.data.map(topQueryToCard).filter((c): c is EntityCard => c !== null),
+  songs: data.songs.data.map(
+    (s): SongSummary => ({
+      type: 'song',
+      id: s.id,
+      name: s.title,
+      url: s.perma_url,
+      image: createImageLinks(s.image),
+      album: str(s.more_info?.album),
+      artists: str(s.more_info?.primary_artists),
+      language: str(s.more_info?.language),
+      explicitContent: isExplicit(s.explicit_content)
+    })
+  ),
+  albums: data.albums.data.map(
+    (a): AlbumSummary => ({
+      type: 'album',
+      id: a.id,
+      name: a.title,
+      url: a.perma_url,
+      image: createImageLinks(a.image),
+      artist: str(a.more_info?.music),
+      year: str(a.more_info?.year),
+      songCount: null,
+      language: str(a.more_info?.language),
+      explicitContent: isExplicit(a.explicit_content)
+    })
+  ),
+  artists: data.artists.data.map(
+    (a): ArtistSummary => ({
+      type: 'artist',
+      id: a.id,
+      name: a.title,
+      url: '',
+      image: createImageLinks(a.image),
+      role: null
+    })
+  ),
+  playlists: data.playlists.data.map(
+    (p): PlaylistSummary => ({
+      type: 'playlist',
+      id: p.id,
+      name: p.title,
+      url: p.perma_url,
+      image: createImageLinks(p.image),
+      songCount: null,
+      followerCount: null,
+      language: str(p.more_info?.language),
+      explicitContent: isExplicit(p.explicit_content)
+    })
+  )
 })

@@ -1,38 +1,35 @@
+import { UseCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { ApiContextEnum } from '#common/enums'
 import { useFetch } from '#common/helpers'
+import { SongAPIResponseModel, type SongModel } from '#modules/songs/models'
 import { createSongPayload } from '#modules/songs/song.helper'
 import { CreateSongStationUseCase } from '#modules/songs/use-cases'
 import { HTTPException } from 'hono/http-exception'
-import type { IUseCase } from '#common/types'
-import type { SongModel, SongSuggestionAPIResponseModel } from '#modules/songs/models'
-import type { z } from 'zod'
+import { z } from 'zod'
 
 export interface GetSongSuggestionsArgs {
   songId: string
   limit: number
 }
 
-export class GetSongSuggestionsUseCase implements IUseCase<GetSongSuggestionsArgs, z.infer<typeof SongModel>[]> {
-  private readonly createSongStation: CreateSongStationUseCase
-
-  constructor() {
-    this.createSongStation = new CreateSongStationUseCase()
-  }
+export class GetSongSuggestionsUseCase extends UseCase<GetSongSuggestionsArgs, z.infer<typeof SongModel>[]> {
+  private readonly createSongStation = new CreateSongStationUseCase()
 
   async execute({ songId, limit }: GetSongSuggestionsArgs) {
     const stationId = await this.createSongStation.execute(songId)
 
-    const { data, ok } = await useFetch<z.infer<typeof SongSuggestionAPIResponseModel>>({
+    const data = await useFetch({
       endpoint: Endpoints.songs.suggestions,
       params: {
         stationid: stationId,
         k: limit
       },
-      context: ApiContextEnum.ANDROID
+      context: ApiContextEnum.ANDROID,
+      schema: z.object({ stationid: z.string() }).and(z.record(z.string(), z.object({ song: SongAPIResponseModel })))
     })
 
-    if (!data || !ok) {
+    if (!data) {
       throw new HTTPException(404, { message: `no suggestions found for the given song` })
     }
 

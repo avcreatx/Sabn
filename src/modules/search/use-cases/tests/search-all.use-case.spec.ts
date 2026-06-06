@@ -1,17 +1,17 @@
-import { SearchModel } from '#modules/search/models'
+import { SearchResultModel } from '#modules/search/models'
 import { SearchAllUseCase } from '#modules/search/use-cases'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 describe('SearchEverything', () => {
-  let searchAllUseCase: SearchAllUseCase
+  let useCase: SearchAllUseCase
 
   beforeAll(() => {
-    searchAllUseCase = new SearchAllUseCase()
+    useCase = new SearchAllUseCase()
   })
 
-  it('should search everything by query and return a list of results', async () => {
-    const results = await searchAllUseCase.execute('imagine+dragons+bones')
+  it('returns grouped search results', async () => {
+    const result = await useCase.execute('imagine dragons bones')
 
-    expect(() => SearchModel.parse(results)).not.toThrow()
+    expect(() => SearchResultModel.parse(result)).not.toThrow()
   })
 })

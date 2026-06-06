@@ -1,18 +1,17 @@
+import { UseCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { useFetch } from '#common/helpers'
+import { SongAPIResponseModel, type SongModel } from '#modules/songs/models'
 import { createSongPayload } from '#modules/songs/song.helper'
 import { HTTPException } from 'hono/http-exception'
-import type { IUseCase } from '#common/types'
-import type { SongAPIResponseModel, SongModel } from '#modules/songs/models'
-import type { z } from 'zod'
+import { z } from 'zod'
 
-export class GetSongByLinkUseCase implements IUseCase<string, z.infer<typeof SongModel>[]> {
-  constructor() {}
-
+export class GetSongByLinkUseCase extends UseCase<string, z.infer<typeof SongModel>[]> {
   async execute(token: string) {
-    const { data } = await useFetch<{ songs: z.infer<typeof SongAPIResponseModel>[] }>({
+    const data = await useFetch({
       endpoint: Endpoints.songs.link,
-      params: { token, type: 'song' }
+      params: { token, type: 'song' },
+      schema: z.object({ songs: z.array(SongAPIResponseModel) })
     })
 
     if (!data.songs?.length) throw new HTTPException(404, { message: 'song not found' })

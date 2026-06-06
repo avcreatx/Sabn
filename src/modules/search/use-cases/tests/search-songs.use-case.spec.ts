@@ -1,17 +1,18 @@
-import { SearchSongModel } from '#modules/search/models'
+import { paginated } from '#common/models'
 import { SearchSongsUseCase } from '#modules/search/use-cases'
+import { SongModel } from '#modules/songs/models'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 describe('SearchSongs', () => {
-  let searchSongsUseCase: SearchSongsUseCase
+  let useCase: SearchSongsUseCase
 
   beforeAll(() => {
-    searchSongsUseCase = new SearchSongsUseCase()
+    useCase = new SearchSongsUseCase()
   })
 
-  it('should search songs by query and return a list of songs', async () => {
-    const songs = await searchSongsUseCase.execute({ query: 'ride', limit: 5, page: 1 })
+  it('returns a paged list of full songs', async () => {
+    const result = await useCase.execute({ query: 'ride', limit: 5, page: 1 })
 
-    expect(() => SearchSongModel.parse(songs)).not.toThrow()
+    expect(() => paginated(SongModel).parse(result)).not.toThrow()
   })
 })

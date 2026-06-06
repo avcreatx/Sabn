@@ -1,4 +1,3 @@
-import { DownloadLinkModel } from '#common/models'
 import { z } from 'zod'
 
 export const SearchPlaylistAPIResponseModel = z.object({
@@ -29,24 +28,6 @@ export const SearchPlaylistAPIResponseModel = z.object({
       explicit_content: z.string(),
       mini_obj: z.boolean(),
       numsongs: z.any()
-    })
-  )
-})
-
-export const SearchPlaylistModel = z.object({
-  total: z.number(),
-  start: z.number(),
-  results: z.array(
-    // TODO: Do this for all search models
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      type: z.string(),
-      image: z.array(DownloadLinkModel),
-      url: z.string(),
-      songCount: z.number().nullable(),
-      language: z.string(),
-      explicitContent: z.boolean()
     })
   )
 })

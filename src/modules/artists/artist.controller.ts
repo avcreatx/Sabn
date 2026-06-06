@@ -1,211 +1,53 @@
-import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
+import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
+import { openApiJsonResponse, openApiPaginatedResponse } from '#common/helpers'
+import { AlbumModel } from '#modules/albums/album.model'
 import { ArtistService } from '#modules/artists/artist.service'
-import { ArtistAlbumModel, ArtistModel, ArtistSongModel } from '#modules/artists/models'
-import { z } from 'zod'
+import { ArtistModel } from '#modules/artists/models'
+import { SongModel } from '#modules/songs/models'
 import type { Routes } from '#common/types'
 
 export class ArtistController implements Routes {
-  public controller: OpenAPIHono
-  private artistService: ArtistService
-
-  constructor() {
-    this.controller = new OpenAPIHono()
-    this.artistService = new ArtistService()
-  }
+  public controller = new OpenAPIHono()
+  private readonly artistService = new ArtistService()
 
   public initRoutes() {
     this.controller.openapi(
       createRoute({
         method: 'get',
-        path: '/artists',
+        path: '/artists/{id}',
         tags: ['Artists'],
-        summary: 'Retrieve artists by ID or link',
-        description: `Retrieve artists by ID or by a direct artist link.`,
-        operationId: 'getArtistByIdOrLink',
+        summary: 'Get an artist by ID',
+        operationId: 'getArtistById',
         request: {
+          params: z.object({ id: z.string().openapi({ example: '1274170' }) }),
           query: z.object({
-            id: z.string().optional().openapi({
-              title: 'Artist ID',
-              description: 'Artist ID',
-              type: 'string',
-              example: '1274170'
-            }),
-            link: z
-              .string()
-              .url()
-              .optional()
-              .transform((value) => value?.match(/jiosaavn\.com\/artist\/[^/]+\/([^/]+)$/)?.[1])
-              .openapi({
-                title: 'Artist Link',
-                description: 'A direct link to the artist on JioSaavn',
-                type: 'string',
-                example: 'https://www.jiosaavn.com/artist/dua-lipa-songs/r-OWIKgpX2I_'
-              }),
-            page: z.string().pipe(z.coerce.number()).optional().openapi({
-              title: 'Page number',
-              description: 'page number',
-              type: 'number',
-              example: '1'
-            }),
-            songCount: z.string().pipe(z.coerce.number()).optional().openapi({
-              title: 'Song count',
-              description: 'Number of songs to fetch',
-              type: 'number',
-              example: '10'
-            }),
-            albumCount: z.string().pipe(z.coerce.number()).optional().openapi({
-              title: 'Album count',
-              description: 'Number of albums to fetch',
-              type: 'number',
-              example: '10'
-            }),
-            sortBy: z.enum(['popularity', 'latest', 'alphabetical']).optional().openapi({
-              title: 'Sort by',
-              description: 'sort by',
-              type: 'string',
-              example: 'popularity'
-            }),
-            sortOrder: z.enum(['asc', 'desc']).optional().openapi({
-              title: 'Sort order',
-              description: 'sort order',
-              type: 'string',
-              example: 'desc',
-              default: 'desc'
-            })
+            page: z.coerce.number().int().min(0).optional(),
+            songCount: z.coerce.number().int().min(1).max(50).optional(),
+            albumCount: z.coerce.number().int().min(1).max(50).optional(),
+            sortBy: z.enum(['popularity', 'latest', 'alphabetical']).optional(),
+            sortOrder: z.enum(['asc', 'desc']).optional()
           })
         },
-        responses: {
-          200: {
-            description: 'Successful response with artist details',
-            content: {
-              'application/json': {
-                schema: z.object({
-                  success: z.boolean().openapi({
-                    description: 'Indicates whether the request was successful',
-                    type: 'boolean',
-                    example: true
-                  }),
-                  data: ArtistModel.openapi({
-                    description: 'Artist details'
-                  })
-                })
-              }
-            }
-          }
-        }
+        responses: openApiJsonResponse(ArtistModel)
       }),
       async (ctx) => {
         const {
-          link,
-          id,
           page = 0,
-          sortBy = 'popularity',
-          sortOrder = 'asc',
           songCount = 10,
-          albumCount = 10
+          albumCount = 10,
+          sortBy = 'popularity',
+          sortOrder = 'asc'
         } = ctx.req.valid('query')
-
-        const response = link
-          ? await this.artistService.getArtistByLink({ token: link, page, songCount, albumCount, sortBy, sortOrder })
-          : await this.artistService.getArtistById({ artistId: id!, page, songCount, albumCount, sortBy, sortOrder })
-
-        return ctx.json({ success: true, data: response })
-      }
-    )
-
-    this.controller.openapi(
-      createRoute({
-        method: 'get',
-        path: '/artists/{id}',
-        tags: ['Artists'],
-        summary: 'Retrieve artist by ID',
-        description: 'Retrieve artist by ID',
-        operationId: 'getArtistById',
-        request: {
-          params: z.object({
-            id: z.string().openapi({
-              title: 'Artist ID',
-              description: 'ID of the artist to retrieve',
-              type: 'string',
-              example: '1274170'
-            })
-          }),
-          query: z.object({
-            page: z.string().pipe(z.coerce.number()).optional().openapi({
-              title: 'Page number',
-              description: 'The page number of the results to retrieve',
-              type: 'integer',
-              example: '0'
-            }),
-            songCount: z.string().pipe(z.coerce.number()).optional().openapi({
-              title: 'Song count',
-              description: 'The number of songs to retrieve for the artist',
-              type: 'integer',
-              example: '10'
-            }),
-            albumCount: z.string().pipe(z.coerce.number()).optional().openapi({
-              title: 'Album count',
-              description: 'The number of albums to retrieve for the artist',
-              type: 'integer',
-              example: '10'
-            }),
-            sortBy: z
-              .enum(['popularity', 'latest', 'alphabetical'])
-              .optional()
-              .openapi({
-                title: 'Sort by',
-                description: 'The field to sort the results by',
-                type: 'string',
-                example: 'popularity',
-                enum: ['popularity', 'latest', 'alphabetical']
-              }),
-            sortOrder: z
-              .enum(['asc', 'desc'])
-              .optional()
-              .openapi({
-                title: 'Sort order',
-                description: 'The order to sort the results by',
-                type: 'string',
-                example: 'desc',
-                enum: ['asc', 'desc']
-              })
+        return ctx.json(
+          await this.artistService.getArtistById({
+            artistId: ctx.req.param('id'),
+            page,
+            songCount,
+            albumCount,
+            sortBy,
+            sortOrder
           })
-        },
-        responses: {
-          200: {
-            description: 'Successful response with artist details',
-            content: {
-              'application/json': {
-                schema: z.object({
-                  success: z.boolean().openapi({
-                    description: 'Indicates whether the request was successful',
-                    type: 'boolean',
-                    example: true
-                  }),
-                  data: ArtistModel
-                })
-              }
-            }
-          },
-          404: {
-            description: 'Artist not found for the given ID'
-          }
-        }
-      }),
-      async (ctx) => {
-        const artistId = ctx.req.param('id')
-        const { page, sortBy, sortOrder, songCount, albumCount } = ctx.req.valid('query')
-
-        const response = await this.artistService.getArtistById({
-          artistId,
-          page: page || 0,
-          songCount: songCount || 10,
-          albumCount: albumCount || 10,
-          sortBy: sortBy || 'popularity',
-          sortOrder: sortOrder || 'asc'
-        })
-
-        return ctx.json({ success: true, data: response })
+        )
       }
     )
 
@@ -214,82 +56,23 @@ export class ArtistController implements Routes {
         method: 'get',
         path: '/artists/{id}/songs',
         tags: ['Artists'],
-        summary: `Retrieve artist's songs`,
-        description: 'Retrieve a list of songs for a given artist by their ID, with optional sorting and pagination.',
+        summary: "Get an artist's songs",
         operationId: 'getArtistSongs',
         request: {
-          params: z.object({
-            id: z.string().openapi({
-              description: 'ID of the artist to retrieve the songs for',
-              type: 'string',
-              example: '1274170',
-              default: '1274170'
-            })
-          }),
+          params: z.object({ id: z.string().openapi({ example: '1274170' }) }),
           query: z.object({
-            page: z.string().pipe(z.coerce.number()).optional().openapi({
-              description: 'The page number of the results to retrieve',
-              type: 'number',
-              example: '0',
-              default: '0'
-            }),
-            sortBy: z
-              .enum(['popularity', 'latest', 'alphabetical'])
-              .optional()
-              .openapi({
-                description: 'The criterion to sort the songs by',
-                type: 'string',
-                example: 'popularity',
-                enum: ['popularity', 'latest', 'alphabetical'],
-                default: 'popularity'
-              }),
-            sortOrder: z
-              .enum(['asc', 'desc'])
-              .optional()
-              .openapi({
-                description: 'The order to sort the songs',
-                type: 'string',
-                example: 'desc',
-                enum: ['asc', 'desc'],
-                default: 'desc'
-              })
+            page: z.coerce.number().int().min(0).optional(),
+            sortBy: z.enum(['popularity', 'latest', 'alphabetical']).optional(),
+            sortOrder: z.enum(['asc', 'desc']).optional()
           })
         },
-        responses: {
-          200: {
-            description: 'Successful response with a list of songs for the artist',
-            content: {
-              'application/json': {
-                schema: z.object({
-                  success: z.boolean().openapi({
-                    description: 'Indicates whether the request was successful',
-                    type: 'boolean',
-                    example: true
-                  }),
-                  data: ArtistSongModel.openapi({
-                    description: 'An array of songs associated with the artist'
-                  })
-                })
-              }
-            }
-          },
-          404: {
-            description: 'Artist not found for the given ID'
-          }
-        }
+        responses: openApiPaginatedResponse(SongModel)
       }),
       async (ctx) => {
-        const artistId = ctx.req.param('id')
-        const { page, sortBy, sortOrder } = ctx.req.valid('query')
-
-        const response = await this.artistService.getArtistSongs({
-          artistId,
-          page: page || 0,
-          sortBy: sortBy || 'popularity',
-          sortOrder: sortOrder || 'desc'
-        })
-
-        return ctx.json({ success: true, data: response })
+        const { page = 1, sortBy = 'popularity', sortOrder = 'desc' } = ctx.req.valid('query')
+        return ctx.json(
+          await this.artistService.getArtistSongs({ artistId: ctx.req.param('id'), page, sortBy, sortOrder })
+        )
       }
     )
 
@@ -298,82 +81,23 @@ export class ArtistController implements Routes {
         method: 'get',
         path: '/artists/{id}/albums',
         tags: ['Artists'],
-        summary: `Retrieve artist's albums`,
-        description: 'Retrieve a list of albums for a given artist by their ID, with optional sorting and pagination.',
+        summary: "Get an artist's albums",
         operationId: 'getArtistAlbums',
         request: {
-          params: z.object({
-            id: z.string().openapi({
-              description: 'ID of the artist to retrieve the albums for',
-              type: 'string',
-              example: '1274170',
-              default: '1274170'
-            })
-          }),
+          params: z.object({ id: z.string().openapi({ example: '1274170' }) }),
           query: z.object({
-            page: z.string().pipe(z.coerce.number()).optional().openapi({
-              description: 'The page number of the results to retrieve',
-              type: 'number',
-              example: '0',
-              default: '0'
-            }),
-            sortBy: z
-              .enum(['popularity', 'latest', 'alphabetical'])
-              .optional()
-              .openapi({
-                description: 'The criterion to sort the albums by',
-                type: 'string',
-                example: 'popularity',
-                enum: ['popularity', 'latest', 'alphabetical'],
-                default: 'popularity'
-              }),
-            sortOrder: z
-              .enum(['asc', 'desc'])
-              .optional()
-              .openapi({
-                description: 'The order to sort the albums',
-                type: 'string',
-                example: 'desc',
-                enum: ['asc', 'desc'],
-                default: 'desc'
-              })
+            page: z.coerce.number().int().min(0).optional(),
+            sortBy: z.enum(['popularity', 'latest', 'alphabetical']).optional(),
+            sortOrder: z.enum(['asc', 'desc']).optional()
           })
         },
-        responses: {
-          200: {
-            description: 'Successful response with a list of albums for the artist',
-            content: {
-              'application/json': {
-                schema: z.object({
-                  success: z.boolean().openapi({
-                    description: 'Indicates whether the request was successful',
-                    type: 'boolean',
-                    example: true
-                  }),
-                  data: ArtistAlbumModel.openapi({
-                    description: 'An array of albums associated with the artist'
-                  })
-                })
-              }
-            }
-          },
-          404: {
-            description: 'Artist not found for the given ID'
-          }
-        }
+        responses: openApiPaginatedResponse(AlbumModel)
       }),
       async (ctx) => {
-        const artistId = ctx.req.param('id')
-        const { page, sortBy, sortOrder } = ctx.req.valid('query')
-
-        const response = await this.artistService.getArtistAlbums({
-          artistId,
-          page: page || 0,
-          sortBy: sortBy || 'popularity',
-          sortOrder: sortOrder || 'desc'
-        })
-
-        return ctx.json({ success: true, data: response })
+        const { page = 1, sortBy = 'popularity', sortOrder = 'desc' } = ctx.req.valid('query')
+        return ctx.json(
+          await this.artistService.getArtistAlbums({ artistId: ctx.req.param('id'), page, sortBy, sortOrder })
+        )
       }
     )
   }

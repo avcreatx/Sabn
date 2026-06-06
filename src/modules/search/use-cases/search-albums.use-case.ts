@@ -1,29 +1,18 @@
+import { UseCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
-import { useFetch } from '#common/helpers'
-import { createSearchAlbumPayload } from '#modules/search/search.helper'
-import type { IUseCase } from '#common/types'
-import type { SearchAlbumAPIResponseModel, SearchAlbumModel } from '#modules/search/models'
-import type { z } from 'zod'
+import { toPage, useFetch } from '#common/helpers'
+import { SearchAlbumAPIResponseModel, type SearchArgs } from '#modules/search/models'
+import { albumResultToSummary } from '#modules/search/search.helper'
+import type { AlbumSummary, Paginated } from '#common/models'
 
-export interface SearchAlbumsArgs {
-  query: string
-  page: number
-  limit: number
-}
-
-export class SearchAlbumsUseCase implements IUseCase<SearchAlbumsArgs, z.infer<typeof SearchAlbumModel>> {
-  constructor() {}
-
-  async execute({ query, limit, page }: SearchAlbumsArgs): Promise<z.infer<typeof SearchAlbumModel>> {
-    const { data } = await useFetch<z.infer<typeof SearchAlbumAPIResponseModel>>({
+export class SearchAlbumsUseCase extends UseCase<SearchArgs, Paginated<AlbumSummary>> {
+  async execute({ query, page, limit }: SearchArgs): Promise<Paginated<AlbumSummary>> {
+    const data = await useFetch({
       endpoint: Endpoints.search.albums,
-      params: {
-        q: query,
-        p: page,
-        n: limit
-      }
+      params: { q: query, p: page - 1, n: limit },
+      schema: SearchAlbumAPIResponseModel
     })
 
-    return createSearchAlbumPayload(data)
+    return toPage(data.results.map(albumResultToSummary), { page, limit, total: data.total })
   }
 }

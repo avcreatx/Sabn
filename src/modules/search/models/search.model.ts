@@ -1,4 +1,11 @@
-import { DownloadLinkModel } from '#common/models'
+import {
+  AlbumSummaryModel,
+  ArtistSummaryModel,
+  EntityCardModel,
+  PaginationQuery,
+  PlaylistSummaryModel,
+  SongSummaryModel
+} from '#common/models'
 import { z } from 'zod'
 
 export const SearchAPIResponseModel = z.object({
@@ -43,7 +50,7 @@ export const SearchAPIResponseModel = z.object({
           vlink: z.string().optional(),
           primary_artists: z.string(),
           singers: z.string(),
-          video_available: z.boolean(),
+          video_available: z.boolean().nullable(),
           triller_available: z.boolean(),
           language: z.string()
         }),
@@ -68,7 +75,7 @@ export const SearchAPIResponseModel = z.object({
           artist_name: z.array(z.string()),
           entity_type: z.string(),
           entity_sub_type: z.string(),
-          video_available: z.boolean(),
+          video_available: z.boolean().nullable(),
           is_dolby_content: z.boolean(),
           sub_types: z.any(),
           images: z.any(),
@@ -105,22 +112,24 @@ export const SearchAPIResponseModel = z.object({
       z.object({
         id: z.string(),
         title: z.string(),
-        subtitle: z.string(),
+        subtitle: z.string().optional(),
         type: z.string(),
         image: z.string(),
-        perma_url: z.string(),
-        more_info: z.object({
-          album: z.string(),
-          ctr: z.number(),
-          score: z.string().optional(),
-          vcode: z.string(),
-          vlink: z.string(),
-          primary_artists: z.string(),
-          singers: z.string(),
-          video_available: z.boolean(),
-          triller_available: z.boolean(),
-          language: z.string()
-        }),
+        perma_url: z.string().optional(),
+        more_info: z
+          .object({
+            album: z.string(),
+            ctr: z.number(),
+            score: z.string().optional(),
+            vcode: z.string(),
+            vlink: z.string(),
+            primary_artists: z.string(),
+            singers: z.string(),
+            video_available: z.boolean().nullable(),
+            triller_available: z.boolean(),
+            language: z.string()
+          })
+          .optional(),
         explicit_content: z.string().optional(),
         mini_obj: z.boolean(),
         description: z.string()
@@ -130,84 +139,18 @@ export const SearchAPIResponseModel = z.object({
   })
 })
 
-const SearchResponseModel = <T>(model: z.ZodType<T, any, any>) =>
-  z.object({
-    results: model,
-    position: z.number()
-  })
-
-export const SearchModel = z.object({
-  albums: SearchResponseModel(
-    z.array(
-      z.object({
-        id: z.string(),
-        title: z.string(),
-        image: z.array(DownloadLinkModel),
-        artist: z.string(),
-        url: z.string(),
-        type: z.string(),
-        description: z.string(),
-        year: z.string(),
-        language: z.string(),
-        songIds: z.string()
-      })
-    )
-  ),
-  songs: SearchResponseModel(
-    z.array(
-      z.object({
-        id: z.string(),
-        title: z.string(),
-        image: z.array(DownloadLinkModel),
-        album: z.string(),
-        url: z.string(),
-        type: z.string(),
-        description: z.string(),
-        primaryArtists: z.string(),
-        singers: z.string(),
-        language: z.string()
-      })
-    )
-  ),
-  artists: SearchResponseModel(
-    z.array(
-      z.object({
-        id: z.string(),
-        title: z.string(),
-        image: z.array(DownloadLinkModel),
-        type: z.string(),
-        description: z.string(),
-        position: z.number()
-      })
-    )
-  ),
-  playlists: SearchResponseModel(
-    z.array(
-      z.object({
-        id: z.string(),
-        title: z.string(),
-        image: z.array(DownloadLinkModel),
-        url: z.string(),
-        language: z.string(),
-        type: z.string(),
-        description: z.string()
-      })
-    )
-  ),
-  topQuery: SearchResponseModel(
-    z.array(
-      z.object({
-        id: z.string(),
-        title: z.string(),
-        image: z.array(DownloadLinkModel),
-        album: z.string(),
-        url: z.string(),
-        type: z.string(),
-        description: z.string(),
-        primaryArtists: z.string(),
-        singers: z.string(),
-        language: z.string()
-      })
-    )
-  )
+/** Envelope-free global search result — grouped cards/summaries. */
+export const SearchResultModel = z.object({
+  topQuery: z.array(EntityCardModel),
+  songs: z.array(SongSummaryModel),
+  albums: z.array(AlbumSummaryModel),
+  artists: z.array(ArtistSummaryModel),
+  playlists: z.array(PlaylistSummaryModel)
 })
+
+/** Shared query for the per-type search endpoints (search term + pagination). */
+export const SearchQuery = PaginationQuery.extend({
+  query: z.string().min(1)
+})
+
+export type SearchArgs = z.infer<typeof SearchQuery>

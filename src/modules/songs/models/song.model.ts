@@ -45,14 +45,14 @@ export const SongAPIResponseModel = z.object({
       featured_artists: z.array(ArtistMapAPIResponseModel),
       artists: z.array(ArtistMapAPIResponseModel)
     }),
-    release_date: z.string(),
+    release_date: z.string().nullable(),
     label_url: z.string(),
-    vcode: z.string(),
-    vlink: z.string(),
+    vcode: z.string().optional(),
+    vlink: z.string().optional(),
     triller_available: z.boolean(),
     request_jiotune_flag: z.boolean(),
     webp: z.string(),
-    lyrics_id: z.string()
+    lyrics_id: z.string().optional()
   })
 })
 

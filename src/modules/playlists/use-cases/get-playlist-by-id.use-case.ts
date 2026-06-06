@@ -1,8 +1,8 @@
+import { UseCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { useFetch } from '#common/helpers'
 import { createPlaylistPayload } from '#modules/playlists/playlist.helper'
 import { HTTPException } from 'hono/http-exception'
-import type { IUseCase } from '#common/types'
 import type { PlaylistAPIResponseModel, PlaylistModel } from '#modules/playlists/playlist.model'
 import type { z } from 'zod'
 
@@ -12,11 +12,9 @@ export interface GetPlaylistByIdArgs {
   page: number
 }
 
-export class GetPlaylistByIdUseCase implements IUseCase<GetPlaylistByIdArgs, z.infer<typeof PlaylistModel>> {
-  constructor() {}
-
+export class GetPlaylistByIdUseCase extends UseCase<GetPlaylistByIdArgs, z.infer<typeof PlaylistModel>> {
   async execute({ id, limit, page }: GetPlaylistByIdArgs) {
-    const { data } = await useFetch<z.infer<typeof PlaylistAPIResponseModel>>({
+    const data = await useFetch<z.infer<typeof PlaylistAPIResponseModel>>({
       endpoint: Endpoints.playlists.id,
       params: {
         listid: id,

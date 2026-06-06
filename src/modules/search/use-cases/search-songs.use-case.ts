@@ -1,33 +1,24 @@
+import { UseCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
-import { useFetch } from '#common/helpers'
+import { toPage, useFetch } from '#common/helpers'
+import { SongAPIResponseModel, type SongModel } from '#modules/songs/models'
 import { createSongPayload } from '#modules/songs/song.helper'
-import type { IUseCase } from '#common/types'
-import type { SearchSongAPIResponseModel, SearchSongModel } from '#modules/search/models'
-import type { z } from 'zod'
+import { z } from 'zod'
+import type { Paginated } from '#common/models'
+import type { SearchArgs } from '#modules/search/models'
 
-export interface SearchSongsArgs {
-  query: string
-  page: number
-  limit: number
-}
-
-export class SearchSongsUseCase implements IUseCase<SearchSongsArgs, z.infer<typeof SearchSongModel>> {
-  constructor() {}
-
-  async execute({ query, limit, page }: SearchSongsArgs): Promise<z.infer<typeof SearchSongModel>> {
-    const { data } = await useFetch<z.infer<typeof SearchSongAPIResponseModel>>({
+export class SearchSongsUseCase extends UseCase<SearchArgs, Paginated<z.infer<typeof SongModel>>> {
+  async execute({ query, page, limit }: SearchArgs): Promise<Paginated<z.infer<typeof SongModel>>> {
+    const data = await useFetch({
       endpoint: Endpoints.search.songs,
-      params: {
-        q: query,
-        p: page,
-        n: limit
-      }
+      params: { q: query, p: page - 1, n: limit },
+      schema: z.object({
+        total: z.number(),
+        start: z.number(),
+        results: z.array(SongAPIResponseModel)
+      })
     })
 
-    return {
-      total: data.total,
-      start: data.start,
-      results: data.results?.map(createSongPayload).slice(0, limit) || []
-    }
+    return toPage(data.results.map(createSongPayload), { page, limit, total: data.total })
   }
 }

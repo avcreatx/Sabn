@@ -1,22 +1,18 @@
-import { ArtistSongModel } from '#modules/artists/models'
+import { paginated } from '#common/models'
 import { GetArtistSongsUseCase } from '#modules/artists/use-cases'
+import { SongModel } from '#modules/songs/models'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 describe('GetArtistSongs', () => {
-  let getArtistSongsUseCase: GetArtistSongsUseCase
+  let useCase: GetArtistSongsUseCase
 
   beforeAll(() => {
-    getArtistSongsUseCase = new GetArtistSongsUseCase()
+    useCase = new GetArtistSongsUseCase()
   })
 
-  it('should get artist songs by artist id and return a list of songs', async () => {
-    const songs = await getArtistSongsUseCase.execute({
-      artistId: '1274170',
-      page: 1,
-      sortBy: 'popularity',
-      sortOrder: 'asc'
-    })
+  it('returns a paged list of the artist songs', async () => {
+    const result = await useCase.execute({ artistId: '1274170', page: 1, sortBy: 'popularity', sortOrder: 'asc' })
 
-    expect(() => ArtistSongModel.parse(songs)).not.toThrow()
+    expect(() => paginated(SongModel).parse(result)).not.toThrow()
   })
 })

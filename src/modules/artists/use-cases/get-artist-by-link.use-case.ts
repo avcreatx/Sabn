@@ -1,8 +1,8 @@
+import { UseCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { useFetch } from '#common/helpers'
 import { createArtistPayload } from '#modules/artists/artist.helper'
 import { HTTPException } from 'hono/http-exception'
-import type { IUseCase } from '#common/types'
 import type { ArtistAPIResponseModel, ArtistModel } from '#modules/artists/models'
 import type { z } from 'zod'
 
@@ -15,11 +15,9 @@ export interface GetArtistByLinkArgs {
   sortOrder: 'asc' | 'desc'
 }
 
-export class GetArtistByLinkUseCase implements IUseCase<GetArtistByLinkArgs, z.infer<typeof ArtistModel>> {
-  constructor() {}
-
+export class GetArtistByLinkUseCase extends UseCase<GetArtistByLinkArgs, z.infer<typeof ArtistModel>> {
   async execute({ token, page, songCount, albumCount, sortBy, sortOrder }: GetArtistByLinkArgs) {
-    const { data } = await useFetch<z.infer<typeof ArtistAPIResponseModel>>({
+    const data = await useFetch<z.infer<typeof ArtistAPIResponseModel>>({
       endpoint: Endpoints.artists.link,
       params: {
         token,

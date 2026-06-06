@@ -1,32 +1,18 @@
+import { UseCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
-import { useFetch } from '#common/helpers'
-import { createSearchPlaylistPayload } from '#modules/search/search.helper'
-import { HTTPException } from 'hono/http-exception'
-import type { IUseCase } from '#common/types'
-import type { SearchPlaylistAPIResponseModel, SearchPlaylistModel } from '#modules/search/models'
-import type { z } from 'zod'
+import { toPage, useFetch } from '#common/helpers'
+import { SearchPlaylistAPIResponseModel, type SearchArgs } from '#modules/search/models'
+import { playlistResultToSummary } from '#modules/search/search.helper'
+import type { Paginated, PlaylistSummary } from '#common/models'
 
-export interface SearchPlaylistsArgs {
-  query: string
-  page: number
-  limit: number
-}
-
-export class SearchPlaylistsUseCase implements IUseCase<SearchPlaylistsArgs, z.infer<typeof SearchPlaylistModel>> {
-  constructor() {}
-
-  async execute({ query, limit, page }: SearchPlaylistsArgs): Promise<z.infer<typeof SearchPlaylistModel>> {
-    const { data } = await useFetch<z.infer<typeof SearchPlaylistAPIResponseModel>>({
+export class SearchPlaylistsUseCase extends UseCase<SearchArgs, Paginated<PlaylistSummary>> {
+  async execute({ query, page, limit }: SearchArgs): Promise<Paginated<PlaylistSummary>> {
+    const data = await useFetch({
       endpoint: Endpoints.search.playlists,
-      params: {
-        q: query,
-        p: page,
-        n: limit
-      }
+      params: { q: query, p: page - 1, n: limit },
+      schema: SearchPlaylistAPIResponseModel
     })
 
-    if (!data) throw new HTTPException(404, { message: 'playlist not found' })
-
-    return createSearchPlaylistPayload(data)
+    return toPage(data.results.map(playlistResultToSummary), { page, limit, total: data.total })
   }
 }

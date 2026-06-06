@@ -1,17 +1,17 @@
-import { SearchPlaylistModel } from '#modules/search/models'
+import { paginated, PlaylistSummaryModel } from '#common/models'
 import { SearchPlaylistsUseCase } from '#modules/search/use-cases'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 describe('SearchPlaylists', () => {
-  let searchPlaylistsUseCase: SearchPlaylistsUseCase
+  let useCase: SearchPlaylistsUseCase
 
   beforeAll(() => {
-    searchPlaylistsUseCase = new SearchPlaylistsUseCase()
+    useCase = new SearchPlaylistsUseCase()
   })
 
-  it('should search playlists by query and return a list of playlists', async () => {
-    const playlists = await searchPlaylistsUseCase.execute({ query: 'indie', limit: 5, page: 0 })
+  it('returns a paged list of playlist summaries', async () => {
+    const result = await useCase.execute({ query: 'indie', limit: 5, page: 1 })
 
-    expect(() => SearchPlaylistModel.parse(playlists)).not.toThrow()
+    expect(() => paginated(PlaylistSummaryModel).parse(result)).not.toThrow()
   })
 })

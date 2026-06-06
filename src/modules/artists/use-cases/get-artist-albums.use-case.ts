@@ -1,10 +1,10 @@
+import { UseCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
-import { useFetch } from '#common/helpers'
+import { toPage, useFetch } from '#common/helpers'
 import { createAlbumPayload } from '#modules/albums/album.helper'
-import { HTTPException } from 'hono/http-exception'
-import type { IUseCase } from '#common/types'
-import type { ArtistAlbumAPIResponseModel, ArtistAlbumModel } from '#modules/artists/models'
-import type { z } from 'zod'
+import { AlbumAPIResponseModel, type AlbumModel } from '#modules/albums/album.model'
+import { z } from 'zod'
+import type { Paginated } from '#common/models'
 
 export interface GetArtistAlbumsArgs {
   artistId: string
@@ -13,25 +13,31 @@ export interface GetArtistAlbumsArgs {
   sortOrder: 'asc' | 'desc'
 }
 
-export class GetArtistAlbumsUseCase implements IUseCase<GetArtistAlbumsArgs, z.infer<typeof ArtistAlbumModel>> {
-  constructor() {}
+export class GetArtistAlbumsUseCase extends UseCase<GetArtistAlbumsArgs, Paginated<z.infer<typeof AlbumModel>>> {
+  async execute(args: GetArtistAlbumsArgs): Promise<Paginated<z.infer<typeof AlbumModel>>> {
+    const { artistId, page, sortBy, sortOrder } = args
 
-  async execute({ artistId, page, sortOrder, sortBy }: GetArtistAlbumsArgs) {
-    const { data } = await useFetch<z.infer<typeof ArtistAlbumAPIResponseModel>>({
+    const data = await useFetch({
       endpoint: Endpoints.artists.albums,
-      params: {
-        artistId,
-        page,
-        sort_order: sortOrder,
-        category: sortBy
-      }
+      params: { artistId, page: page - 1, sort_order: sortOrder, category: sortBy },
+      schema: z.object({
+        artistId: z.string(),
+        name: z.string(),
+        subtitle: z.string().optional(),
+        image: z.string(),
+        follower_count: z.string(),
+        type: z.string(),
+        isVerified: z.boolean(),
+        dominantLanguage: z.string(),
+        dominantType: z.string(),
+        topAlbums: z.object({
+          albums: z.array(AlbumAPIResponseModel),
+          total: z.number()
+        })
+      })
     })
 
-    if (!data) throw new HTTPException(404, { message: 'artist albums not found' })
-
-    return {
-      total: data.topAlbums.total,
-      albums: data.topAlbums.albums.map((album) => createAlbumPayload(album))
-    }
+    const results = data.topAlbums.albums.map(createAlbumPayload)
+    return toPage(results, { page, limit: results.length, total: data.topAlbums.total })
   }
 }
