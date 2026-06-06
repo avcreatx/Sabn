@@ -7,6 +7,13 @@ import { Home } from './pages/home'
 import type { Routes } from '#common/types'
 import type { HTTPException } from 'hono/http-exception'
 
+const ERROR_CODE_MAP: Record<number, string> = {
+  400: 'BAD_REQUEST',
+  404: 'NOT_FOUND',
+  429: 'TOO_MANY_REQUESTS',
+  500: 'INTERNAL_SERVER_ERROR'
+}
+
 export class App {
   private app: OpenAPIHono
 
@@ -78,14 +85,17 @@ export class App {
 
   private initializeRouteFallback() {
     this.app.notFound((ctx) => {
-      return ctx.json({ success: false, message: 'route not found, check docs at https://saavn.dev/docs' }, 404)
+      return ctx.json({ error: { code: 'NOT_FOUND', message: 'Route not found, see /docs' } }, 404)
     })
   }
 
   private initializeErrorHandler() {
     this.app.onError((err, ctx) => {
       const error = err as HTTPException
-      return ctx.json({ success: false, message: error.message }, error.status || 500)
+      const status = error.status || 500
+      const code = ERROR_CODE_MAP[status] || 'ERROR'
+
+      return ctx.json({ error: { code, message: error.message } }, status)
     })
   }
 
