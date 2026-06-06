@@ -1,6 +1,6 @@
+import { beforeAll, describe, expect, it } from 'vitest'
 import { ArtistModel } from '#modules/artists/models'
 import { ArtistController } from '#modules/index'
-import { beforeAll, describe, expect, it } from 'vitest'
 
 describe('ArtistController', () => {
   let controller: ArtistController

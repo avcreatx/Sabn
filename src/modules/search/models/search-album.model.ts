@@ -1,5 +1,5 @@
-import { SongAPIResponseModel } from '#modules/songs/models'
 import { z } from 'zod'
+import { SongAPIResponseModel } from '#modules/songs/models'
 
 export const SearchAlbumAPIResponseModel = z.object({
   total: z.number(),

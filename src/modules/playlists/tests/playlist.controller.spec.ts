@@ -1,6 +1,6 @@
+import { beforeAll, describe, expect, it } from 'vitest'
 import { PlaylistController } from '#modules/playlists/playlist.controller'
 import { PlaylistModel } from '#modules/playlists/playlist.model'
-import { beforeAll, describe, expect, it } from 'vitest'
 
 describe('PlaylistController', () => {
   let controller: PlaylistController

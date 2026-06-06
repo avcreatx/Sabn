@@ -1,2 +1,2 @@
-export * from './artist.model'
 export * from './artist-map.model'
+export * from './artist.model'

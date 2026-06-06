@@ -8,7 +8,7 @@ export const Meteors = ({ number }: { number: number }) => {
       {Array.from({ length: number || 20 }, (_, idx) => (
         <span
           key={idx}
-          class="meteor animate-[meteorAnimation_3s_linear_infinite] absolute h-1 w-1 rounded-[9999px] shadow-[0_0_0_1px_#ffffff10] rotate-[215deg]"
+          class="meteor absolute h-1 w-1 rotate-[215deg] animate-[meteorAnimation_3s_linear_infinite] rounded-[9999px] shadow-[0_0_0_1px_#ffffff10]"
           style={{
             top: 0,
             left: `${Math.floor(Math.random() * (400 - -400) + -400)}px`,
@@ -86,12 +86,12 @@ Home.get('/', (c) => {
           }}
         />
       </head>
-      <body class="bg-black mx-auto md:min-h-screen max-w-screen-lg flex flex-col">
-        <main class="mx-auto my-auto flex flex-col space-y-8 px-4 pb-8 md:py-10 relative overflow-y-hidden overflow-x-hidden">
+      <body class="mx-auto flex max-w-screen-lg flex-col bg-black md:min-h-screen">
+        <main class="relative mx-auto my-auto flex flex-col space-y-8 overflow-x-hidden overflow-y-hidden px-4 pb-8 md:py-10">
           <Meteors number={15} />
 
-          <div class="flex flex-row items-center space-x-4 ml-6">
-            <svg class="sm:h-12 sm:w-12 h-8 w-8 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <div class="ml-6 flex flex-row items-center space-x-4">
+            <svg class="h-8 w-8 shrink-0 sm:h-12 sm:w-12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
                 fill="#ff7d78"
                 d="M3.172 3.464C2 4.93 2 7.286 2 12c0 4.714 0 7.071 1.172 8.535C4.343 22 6.229 22 10 22h3.376A4.25 4.25 0 0 1 17 16.007V12.25a2.25 2.25 0 0 1 4.5 0a.75.75 0 0 0 .5.707V12c0-4.714 0-7.071-1.172-8.536C19.657 2 17.771 2 14 2h-4C6.229 2 4.343 2 3.172 3.464"
@@ -104,27 +104,27 @@ Home.get('/', (c) => {
                 clip-rule="evenodd"
               />
             </svg>
-            <p class="text-2xl md:text-4xl text-transparent font-bold leading-none bg-clip-text bg-gradient-to-r from-[#ff7d78] to-purple-600">
+            <p class="bg-gradient-to-r from-[#ff7d78] to-purple-600 bg-clip-text text-2xl leading-none font-bold text-transparent md:text-4xl">
               JioSaavn API
-              <span class="uppercase text-sm ml-3 text-gray-500 font-normal sm:hidden">Unofficial</span>
+              <span class="ml-3 text-sm font-normal text-gray-500 uppercase sm:hidden">Unofficial</span>
             </p>
-            <p class="hidden sm:block animate-[borderAnimation_3s_linear_infinite] rounded bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 bg-[length:400%_400%] p-1">
-              <span class="block rounded px-1.5 py-0.5 text-xs text-white uppercase tracking-wider">Unofficial</span>
+            <p class="hidden animate-[borderAnimation_3s_linear_infinite] rounded bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 bg-[length:400%_400%] p-1 sm:block">
+              <span class="block rounded px-1.5 py-0.5 text-xs tracking-wider text-white uppercase">Unofficial</span>
             </p>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-2 sm:gap-0 relative grid-flow-row">
+          <div class="relative grid grid-flow-row grid-cols-1 gap-2 sm:grid-cols-4 sm:gap-0 lg:grid-cols-4 xl:grid-cols-8">
             <a
               target="_blank"
-              class="p-4 sm:p-8 hover:bg-opacity-5 hover:bg-white rounded-lg duration-100 sm:col-span-4"
+              class="hover:bg-opacity-5 rounded-lg p-4 duration-100 hover:bg-white sm:col-span-4 sm:p-8"
               href="/docs"
             >
               <div class="flex flex-col">
-                <span class="text-xs uppercase bg-opacity-15 rounded text-center max-w-fit px-2 py-1 font-bold tracking-wide bg-red-500 text-red-500">
+                <span class="bg-opacity-15 max-w-fit rounded bg-red-500 px-2 py-1 text-center text-xs font-bold tracking-wide text-red-500 uppercase">
                   Get Started
                 </span>
-                <span class="text-neutral-200 font-bold text-lg sm:text-xl md:text-2xl mt-2">Explore the Docs</span>
-                <div class="text-neutral-500 mt-2">
+                <span class="mt-2 text-lg font-bold text-neutral-200 sm:text-xl md:text-2xl">Explore the Docs</span>
+                <div class="mt-2 text-neutral-500">
                   Check out the documentation to learn how to use the JioSaavn API.
                 </div>
               </div>
@@ -132,48 +132,48 @@ Home.get('/', (c) => {
 
             <a
               target="_blank"
-              class="p-4 sm:p-8 hover:bg-opacity-5 hover:bg-white rounded-lg duration-100 sm:col-span-4"
+              class="hover:bg-opacity-5 rounded-lg p-4 duration-100 hover:bg-white sm:col-span-4 sm:p-8"
               href="https://github.com/sumitkolhe/jiosaavn-api"
             >
               <div class="flex flex-col">
-                <span class="text-xs uppercase bg-opacity-15 rounded text-center max-w-fit px-2 py-1 font-bold tracking-wide bg-green-500 text-green-500">
+                <span class="bg-opacity-15 max-w-fit rounded bg-green-500 px-2 py-1 text-center text-xs font-bold tracking-wide text-green-500 uppercase">
                   Open Source
                 </span>
-                <span class="text-neutral-200 font-bold text-lg sm:text-xl md:text-2xl mt-2">Open Source</span>
-                <div class="text-neutral-500 mt-2">Saavn API is open-source. Check out the source code on github.</div>
+                <span class="mt-2 text-lg font-bold text-neutral-200 sm:text-xl md:text-2xl">Open Source</span>
+                <div class="mt-2 text-neutral-500">Saavn API is open-source. Check out the source code on github.</div>
               </div>
             </a>
 
             <a
               target="_blank"
-              class="p-4 sm:p-8 hover:bg-opacity-5 hover:bg-white rounded-lg duration-100 sm:col-span-4"
+              class="hover:bg-opacity-5 rounded-lg p-4 duration-100 hover:bg-white sm:col-span-4 sm:p-8"
               href="https://github.com/sumitkolhe/jiosaavn-api/issues"
             >
               <div class="flex flex-col">
-                <span class="text-xs uppercase bg-opacity-15 rounded text-center max-w-fit px-2 py-1 font-bold tracking-wide bg-violet-500 text-violet-500">
+                <span class="bg-opacity-15 max-w-fit rounded bg-violet-500 px-2 py-1 text-center text-xs font-bold tracking-wide text-violet-500 uppercase">
                   Contribute
                 </span>
-                <span class="text-neutral-200 font-bold text-lg sm:text-xl md:text-2xl mt-2">Get Involved</span>
-                <div class="text-neutral-500 mt-2">
+                <span class="mt-2 text-lg font-bold text-neutral-200 sm:text-xl md:text-2xl">Get Involved</span>
+                <div class="mt-2 text-neutral-500">
                   Encounter a bug or have a feature suggestion? Report it on GitHub or contribute by submitting a pull
                   request.
                 </div>
               </div>
             </a>
 
-            <div class="p-4 sm:p-8 hover:bg-opacity-5 hover:bg-white rounded-lg duration-100 sm:col-span-4">
+            <div class="hover:bg-opacity-5 rounded-lg p-4 duration-100 hover:bg-white sm:col-span-4 sm:p-8">
               <div class="flex flex-col">
-                <span class="text-xs uppercase bg-opacity-15 rounded text-center max-w-fit px-2 py-1 font-bold tracking-wide bg-blue-500 text-blue-500">
+                <span class="bg-opacity-15 max-w-fit rounded bg-blue-500 px-2 py-1 text-center text-xs font-bold tracking-wide text-blue-500 uppercase">
                   Contact
                 </span>
-                <span class="text-neutral-200 font-bold text-lg sm:text-xl md:text-2xl mt-2">Sumit Kolhe</span>
-                <div class="text-neutral-500 mt-2">
+                <span class="mt-2 text-lg font-bold text-neutral-200 sm:text-xl md:text-2xl">Sumit Kolhe</span>
+                <div class="mt-2 text-neutral-500">
                   Have a question or need help? Reach out on{' '}
                   <a
                     href="https://github.com/sumitkolhe"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:underline text-indigo-500"
+                    className="text-indigo-500 hover:underline"
                   >
                     GitHub
                   </a>
@@ -182,7 +182,7 @@ Home.get('/', (c) => {
                     href="https://twitter.com/thesumitkolhe"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:underline text-sky-500"
+                    className="text-sky-500 hover:underline"
                   >
                     Twitter
                   </a>
@@ -191,7 +191,7 @@ Home.get('/', (c) => {
                     href="https://t.me/sumitkolhe"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:underline text-pink-500"
+                    className="text-pink-500 hover:underline"
                   >
                     Telegram.
                   </a>

@@ -1,8 +1,8 @@
+import { HTTPException } from 'hono/http-exception'
 import { UseCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { useFetch } from '#common/helpers'
 import { createArtistPayload } from '#modules/artists/artist.helper'
-import { HTTPException } from 'hono/http-exception'
 import type { ArtistAPIResponseModel, ArtistModel } from '#modules/artists/models'
 import type { z } from 'zod'
 

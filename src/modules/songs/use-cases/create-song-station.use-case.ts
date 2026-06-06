@@ -1,8 +1,8 @@
+import { HTTPException } from 'hono/http-exception'
 import { UseCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { ApiContextEnum } from '#common/enums'
 import { useFetch } from '#common/helpers'
-import { HTTPException } from 'hono/http-exception'
 
 export class CreateSongStationUseCase extends UseCase<string, string> {
   async execute(songId: string) {

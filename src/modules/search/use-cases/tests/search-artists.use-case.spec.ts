@@ -1,6 +1,6 @@
+import { beforeAll, describe, expect, it } from 'vitest'
 import { ArtistSummaryModel, paginated } from '#common/models'
 import { SearchArtistsUseCase } from '#modules/search/use-cases'
-import { beforeAll, describe, expect, it } from 'vitest'
 
 describe('SearchArtists', () => {
   let useCase: SearchArtistsUseCase

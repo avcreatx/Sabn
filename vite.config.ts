@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [nitro()],
   resolve: {
     alias: {
-      '#modules': fileURLToPath(new URL('./src/modules', import.meta.url)),
-      '#common': fileURLToPath(new URL('./src/common', import.meta.url))
+      '#modules': fileURLToPath(new URL('src/modules', import.meta.url)),
+      '#common': fileURLToPath(new URL('src/common', import.meta.url))
     }
   }
 })

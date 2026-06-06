@@ -1,6 +1,6 @@
+import { beforeAll, describe, expect, it } from 'vitest'
 import { AlbumModel } from '#modules/albums/album.model'
 import { AlbumController } from '#modules/index'
-import { beforeAll, describe, expect, it } from 'vitest'
 
 describe('AlbumController', () => {
   let controller: AlbumController

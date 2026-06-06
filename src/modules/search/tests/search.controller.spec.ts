@@ -1,8 +1,8 @@
+import { beforeAll, describe, expect, it } from 'vitest'
 import { AlbumSummaryModel, ArtistSummaryModel, paginated, PlaylistSummaryModel } from '#common/models'
 import { SearchController } from '#modules/index'
 import { SearchResultModel } from '#modules/search/models'
 import { SongModel } from '#modules/songs/models'
-import { beforeAll, describe, expect, it } from 'vitest'
 
 describe('SearchController', () => {
   let controller: SearchController

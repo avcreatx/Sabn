@@ -1,7 +1,3 @@
-export default {
-  semi: false,
-  trailingComma: 'none',
-  singleQuote: true,
-  printWidth: 120,
-  tabWidth: 2
-}
+import { prettierConfig } from '@kolhe/eslint-config'
+
+export default prettierConfig

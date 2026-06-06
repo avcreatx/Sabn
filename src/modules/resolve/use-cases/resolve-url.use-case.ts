@@ -1,9 +1,9 @@
+import { HTTPException } from 'hono/http-exception'
 import { UseCase } from '#common/classes'
 import { AlbumService } from '#modules/albums/album.service'
 import { ArtistService } from '#modules/artists/artist.service'
 import { PlaylistService } from '#modules/playlists/playlist.service'
 import { SongService } from '#modules/songs/song.service'
-import { HTTPException } from 'hono/http-exception'
 import type { ResolveResult } from '#modules/resolve/resolve.model'
 
 // Maps a JioSaavn URL shape to its entity type + perma-token.

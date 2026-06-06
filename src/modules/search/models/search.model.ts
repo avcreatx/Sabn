@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import {
   AlbumSummaryModel,
   ArtistSummaryModel,
@@ -6,7 +7,6 @@ import {
   PlaylistSummaryModel,
   SongSummaryModel
 } from '#common/models'
-import { z } from 'zod'
 
 export const SearchAPIResponseModel = z.object({
   albums: z.object({

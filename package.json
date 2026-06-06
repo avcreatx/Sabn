@@ -1,12 +1,12 @@
 {
   "name": "jiosaavn-api",
-  "version": "0.1.0",
-  "packageManager": "pnpm@11.5.1+sha512.93f7b57422ea7068257235b4c16eb60762eb68e1dc23723199cc739043ea9be2c4143274a399d8c6defa2b1176226d9ca1c4b63482d6200c1a8fbaa78c1d1485",
-  "description": "Unofficial JioSaavn API",
   "type": "module",
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.5.2",
+  "description": "Unofficial JioSaavn API",
+  "author": "Sumit Kolhe",
   "license": "MIT",
   "repository": "https://github.com/sumitkolhe/jiosaavn-api",
-  "author": "Sumit Kolhe",
   "imports": {
     "#modules/*": "./src/modules/*",
     "#common/*": "./src/common/*"
@@ -27,37 +27,38 @@
     "spell-check": "cspell .",
     "postinstall": "simple-git-hooks"
   },
+  "dependencies": {
+    "@hono/zod-openapi": "^1.4.0",
+    "@hono/zod-validator": "^0.8.0",
+    "@scalar/hono-api-reference": "^0.10.20",
+    "consola": "^3.4.2",
+    "hono": "^4.12.23",
+    "node-forge": "^1.4.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
+    "@kolhe/eslint-config": "3.3.0",
+    "@types/node": "^25.9.2",
+    "@types/node-forge": "^1.3.14",
+    "@vitest/coverage-v8": "^4.1.8",
+    "@vitest/ui": "^4.1.8",
+    "changelogen": "^0.6.2",
+    "cspell": "10.0.1",
+    "eslint": "^10.4.1",
+    "eslint-plugin-prettier": "^5.5.6",
+    "nitro": "3.0.260603-beta",
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.8.0",
+    "simple-git-hooks": "^2.13.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8",
+    "wrangler": "^4.98.0"
+  },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint && pnpm format",
     "commit-msg": "pnpm exec commitlint --edit $1"
-  },
-  "dependencies": {
-    "@hono/zod-openapi": "^0.19.2",
-    "@hono/zod-validator": "^0.4.3",
-    "@scalar/hono-api-reference": "^0.7.4",
-    "consola": "^3.4.2",
-    "hono": "^4.7.5",
-    "node-forge": "^1.3.1",
-    "zod": "^3.24.2"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^19.8.0",
-    "@commitlint/config-conventional": "^19.8.0",
-    "@kolhe/eslint-config": "2.2.6",
-    "@types/node": "^22.13.14",
-    "@types/node-forge": "^1.3.11",
-    "@vitest/coverage-v8": "^4.0.0",
-    "@vitest/ui": "^4.0.0",
-    "changelogen": "^0.6.1",
-    "cspell": "8.18.1",
-    "eslint": "^9.23.0",
-    "eslint-plugin-prettier": "^5.2.5",
-    "nitro": "3.0.260603-beta",
-    "prettier": "^3.5.3",
-    "simple-git-hooks": "^2.12.1",
-    "typescript": "^5.8.2",
-    "vite": "^8.0.0",
-    "vitest": "^4.0.0",
-    "wrangler": "^4.6.0"
   }
 }

@@ -1,6 +1,6 @@
+import { z } from 'zod'
 import { DownloadLinkModel } from '#common/models'
 import { ArtistMapAPIResponseModel, ArtistMapModel } from '#modules/artists/models/artist-map.model'
-import { z } from 'zod'
 
 export const SongAPIResponseModel = z.object({
   id: z.string(),

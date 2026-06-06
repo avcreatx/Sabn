@@ -1,8 +1,8 @@
+import { z } from 'zod'
 import { AlbumModel } from '#modules/albums/album.model'
 import { ArtistModel } from '#modules/artists/models'
 import { PlaylistModel } from '#modules/playlists/playlist.model'
 import { SongModel } from '#modules/songs/models'
-import { z } from 'zod'
 
 /** A resolved JioSaavn link — the entity, discriminated by `type`. */
 export const ResolveResultModel = z.discriminatedUnion('type', [

@@ -1,6 +1,6 @@
+import { beforeAll, describe, expect, it } from 'vitest'
 import { ResolveController } from '#modules/index'
 import { ResolveResultModel } from '#modules/resolve/resolve.model'
-import { beforeAll, describe, expect, it } from 'vitest'
 
 describe('ResolveController', () => {
   let controller: ResolveController

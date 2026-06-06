@@ -1,6 +1,6 @@
+import { beforeAll, describe, expect, it } from 'vitest'
 import { SongController } from '#modules/index'
 import { SongModel } from '#modules/songs/models'
-import { beforeAll, describe, expect, it } from 'vitest'
 import type { z } from 'zod'
 
 describe('SongController', () => {

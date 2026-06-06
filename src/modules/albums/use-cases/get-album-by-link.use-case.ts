@@ -1,8 +1,8 @@
+import { HTTPException } from 'hono/http-exception'
 import { UseCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { useFetch } from '#common/helpers'
 import { createAlbumPayload } from '#modules/albums/album.helper'
-import { HTTPException } from 'hono/http-exception'
 import type { AlbumAPIResponseModel, AlbumModel } from '#modules/albums/album.model'
 import type { z } from 'zod'
 

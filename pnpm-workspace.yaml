@@ -6,3 +6,4 @@ allowBuilds:
   workerd: true
 minimumReleaseAgeExclude:
   - nitro@3.0.260603-beta
+  - '@types/node@25.9.2'

@@ -1,7 +1,7 @@
-import { SongModel } from '#modules/songs/models'
-import { GetSongByIdsUseCase } from '#modules/songs/use-cases'
 import { HTTPException } from 'hono/http-exception'
 import { beforeAll, describe, expect, it } from 'vitest'
+import { SongModel } from '#modules/songs/models'
+import { GetSongByIdsUseCase } from '#modules/songs/use-cases'
 
 describe('GetSongById', () => {
   let getSongByIdsUseCase: GetSongByIdsUseCase

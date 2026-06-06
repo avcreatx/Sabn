@@ -1,9 +1,9 @@
+import { z } from 'zod'
 import { UseCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { toPage, useFetch } from '#common/helpers'
 import { SongAPIResponseModel, type SongModel } from '#modules/songs/models'
 import { createSongPayload } from '#modules/songs/song.helper'
-import { z } from 'zod'
 import type { Paginated } from '#common/models'
 import type { SearchArgs } from '#modules/search/models'
 

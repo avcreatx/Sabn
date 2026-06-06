@@ -1,7 +1,7 @@
+import { beforeAll, describe, expect, it } from 'vitest'
 import { paginated } from '#common/models'
 import { AlbumModel } from '#modules/albums/album.model'
 import { GetArtistAlbumsUseCase } from '#modules/artists/use-cases'
-import { beforeAll, describe, expect, it } from 'vitest'
 
 describe('GetArtistAlbums', () => {
   let useCase: GetArtistAlbumsUseCase

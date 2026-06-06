@@ -1,9 +1,9 @@
+import { z } from 'zod'
 import { UseCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { toPage, useFetch } from '#common/helpers'
 import { createAlbumPayload } from '#modules/albums/album.helper'
 import { AlbumAPIResponseModel, type AlbumModel } from '#modules/albums/album.model'
-import { z } from 'zod'
 import type { Paginated } from '#common/models'
 
 export interface GetArtistAlbumsArgs {
