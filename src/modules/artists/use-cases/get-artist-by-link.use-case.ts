@@ -1,10 +1,9 @@
 import { HTTPException } from 'hono/http-exception'
-import { UseCase } from '#common/classes'
+import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { useFetch } from '#common/helpers'
 import { createArtistPayload } from '#modules/artists/artist.helper'
-import type { ArtistAPIResponseModel, ArtistModel } from '#modules/artists/models'
-import type { z } from 'zod'
+import { ArtistModel, RawArtistModel } from '#modules/artists/models'
 
 export interface GetArtistByLinkArgs {
   token: string
@@ -15,9 +14,9 @@ export interface GetArtistByLinkArgs {
   sortOrder: 'asc' | 'desc'
 }
 
-export class GetArtistByLinkUseCase extends UseCase<GetArtistByLinkArgs, z.infer<typeof ArtistModel>> {
+export class GetArtistByLinkUseCase extends useCase(ArtistModel) {
   async execute({ token, page, songCount, albumCount, sortBy, sortOrder }: GetArtistByLinkArgs) {
-    const data = await useFetch<z.infer<typeof ArtistAPIResponseModel>>({
+    const data = await useFetch({
       endpoint: Endpoints.artists.link,
       params: {
         token,
@@ -27,7 +26,8 @@ export class GetArtistByLinkUseCase extends UseCase<GetArtistByLinkArgs, z.infer
         sort_order: sortOrder,
         category: sortBy,
         type: 'artist'
-      }
+      },
+      schema: RawArtistModel
     })
 
     if (!data) throw new HTTPException(404, { message: 'artist not found' })

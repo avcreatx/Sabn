@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { SongAPIResponseModel } from '#modules/songs/models'
+import { RawSongModel } from '#modules/songs/models'
 
 export const SearchAlbumAPIResponseModel = z.object({
   total: z.number(),
@@ -25,7 +25,7 @@ export const SearchAlbumAPIResponseModel = z.object({
         text: z.string(),
         music: z.string(),
         song_count: z.string(),
-        artistMap: SongAPIResponseModel.shape.more_info.shape.artistMap
+        artistMap: RawSongModel.shape.more_info.shape.artistMap
       })
     })
   )

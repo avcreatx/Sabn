@@ -29,7 +29,6 @@ export class App {
 
   private initializeRoutes(routes: Routes[]) {
     routes.forEach((route) => {
-      route.initRoutes()
       this.app.route('/api', route.controller)
     })
 

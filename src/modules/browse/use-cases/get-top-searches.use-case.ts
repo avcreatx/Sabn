@@ -1,12 +1,12 @@
-import { UseCase } from '#common/classes'
+import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { toPage, useFetch } from '#common/helpers'
+import { EntityCardModel, paginated, type PaginationArgs } from '#common/models'
 import { toCards } from '#modules/browse/browse.helper'
 import { FeedListAPIResponseModel } from '#modules/browse/models'
-import type { EntityCard, Paginated, PaginationArgs } from '#common/models'
 
-export class GetTopSearchesUseCase extends UseCase<PaginationArgs, Paginated<EntityCard>> {
-  async execute({ page, limit }: PaginationArgs): Promise<Paginated<EntityCard>> {
+export class GetTopSearchesUseCase extends useCase(paginated(EntityCardModel)) {
+  async execute({ page, limit }: PaginationArgs) {
     const data = await useFetch({
       endpoint: Endpoints.browse.topSearches,
       params: {},

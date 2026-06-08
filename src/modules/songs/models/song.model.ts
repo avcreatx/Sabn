@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import { DownloadLinkModel } from '#common/models'
-import { ArtistMapAPIResponseModel, ArtistMapModel } from '#modules/artists/models/artist-map.model'
+import { ArtistMapModel, RawArtistMapModel } from '#modules/artists/models/artist-map.model'
 
-export const SongAPIResponseModel = z.object({
+export const RawSongModel = z.object({
   id: z.string(),
   title: z.string(),
   subtitle: z.string(),
@@ -41,9 +41,9 @@ export const SongAPIResponseModel = z.object({
     starred: z.string(),
     copyright_text: z.string(),
     artistMap: z.object({
-      primary_artists: z.array(ArtistMapAPIResponseModel),
-      featured_artists: z.array(ArtistMapAPIResponseModel),
-      artists: z.array(ArtistMapAPIResponseModel)
+      primary_artists: z.array(RawArtistMapModel),
+      featured_artists: z.array(RawArtistMapModel),
+      artists: z.array(RawArtistMapModel)
     }),
     release_date: z.string().nullable(),
     label_url: z.string(),

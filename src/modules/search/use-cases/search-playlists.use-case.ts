@@ -1,12 +1,12 @@
-import { UseCase } from '#common/classes'
+import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { toPage, useFetch } from '#common/helpers'
+import { paginated, PlaylistSummaryModel } from '#common/models'
 import { SearchPlaylistAPIResponseModel, type SearchArgs } from '#modules/search/models'
 import { playlistResultToSummary } from '#modules/search/search.helper'
-import type { Paginated, PlaylistSummary } from '#common/models'
 
-export class SearchPlaylistsUseCase extends UseCase<SearchArgs, Paginated<PlaylistSummary>> {
-  async execute({ query, page, limit }: SearchArgs): Promise<Paginated<PlaylistSummary>> {
+export class SearchPlaylistsUseCase extends useCase(paginated(PlaylistSummaryModel)) {
+  async execute({ query, page, limit }: SearchArgs) {
     const data = await useFetch({
       endpoint: Endpoints.search.playlists,
       params: { q: query, p: page - 1, n: limit },

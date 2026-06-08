@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import { DownloadLinkModel } from '#common/models'
-import { SongAPIResponseModel, SongModel } from '#modules/songs/models'
+import { RawSongModel, SongModel } from '#modules/songs/models'
 
-export const AlbumAPIResponseModel = z.object({
+export const RawAlbumModel = z.object({
   id: z.string(),
   title: z.string(),
   subtitle: z.string(),
@@ -16,9 +16,9 @@ export const AlbumAPIResponseModel = z.object({
   explicit_content: z.string(),
   list_count: z.string(),
   list_type: z.string(),
-  list: z.array(SongAPIResponseModel),
+  list: z.array(RawSongModel),
   more_info: z.object({
-    artistMap: SongAPIResponseModel.shape.more_info.shape.artistMap,
+    artistMap: RawSongModel.shape.more_info.shape.artistMap,
     song_count: z.string(),
     copyright_text: z.string(),
     is_dolby_content: z.boolean(),

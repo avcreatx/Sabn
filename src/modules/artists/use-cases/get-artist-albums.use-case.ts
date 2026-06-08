@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { UseCase } from '#common/classes'
+import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { toPage, useFetch } from '#common/helpers'
+import { paginated } from '#common/models'
 import { createAlbumPayload } from '#modules/albums/album.helper'
-import { AlbumAPIResponseModel, type AlbumModel } from '#modules/albums/album.model'
-import type { Paginated } from '#common/models'
+import { AlbumModel, RawAlbumModel } from '#modules/albums/album.model'
 
 export interface GetArtistAlbumsArgs {
   artistId: string
@@ -13,8 +13,8 @@ export interface GetArtistAlbumsArgs {
   sortOrder: 'asc' | 'desc'
 }
 
-export class GetArtistAlbumsUseCase extends UseCase<GetArtistAlbumsArgs, Paginated<z.infer<typeof AlbumModel>>> {
-  async execute(args: GetArtistAlbumsArgs): Promise<Paginated<z.infer<typeof AlbumModel>>> {
+export class GetArtistAlbumsUseCase extends useCase(paginated(AlbumModel)) {
+  async execute(args: GetArtistAlbumsArgs) {
     const { artistId, page, sortBy, sortOrder } = args
 
     const data = await useFetch({
@@ -31,7 +31,7 @@ export class GetArtistAlbumsUseCase extends UseCase<GetArtistAlbumsArgs, Paginat
         dominantLanguage: z.string(),
         dominantType: z.string(),
         topAlbums: z.object({
-          albums: z.array(AlbumAPIResponseModel),
+          albums: z.array(RawAlbumModel),
           total: z.number()
         })
       })

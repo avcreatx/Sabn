@@ -1,12 +1,10 @@
 import { createImageLinks } from '#common/helpers'
 import { createArtistMapPayload } from '#modules/artists/artist.helper'
 import { createSongPayload } from '#modules/songs/song.helper'
-import type { PlaylistAPIResponseModel, PlaylistModel } from '#modules/playlists/playlist.model'
+import type { PlaylistModel, RawPlaylistModel } from '#modules/playlists/playlist.model'
 import type { z } from 'zod'
 
-export const createPlaylistPayload = (
-  playlist: z.infer<typeof PlaylistAPIResponseModel>
-): z.infer<typeof PlaylistModel> => ({
+export const createPlaylistPayload = (playlist: z.infer<typeof RawPlaylistModel>): z.infer<typeof PlaylistModel> => ({
   id: playlist.id,
   name: playlist.title,
   description: playlist.header_desc,

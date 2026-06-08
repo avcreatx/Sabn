@@ -2,15 +2,10 @@ import { createImageLinks } from '#common/helpers'
 import { safeJsonParse } from '#common/utils'
 import { createAlbumPayload } from '#modules/albums/album.helper'
 import { createSongPayload } from '#modules/songs/song.helper'
-import type {
-  ArtistAPIResponseModel,
-  ArtistMapAPIResponseModel,
-  ArtistMapModel,
-  ArtistModel
-} from '#modules/artists/models'
+import type { ArtistMapModel, ArtistModel, RawArtistMapModel, RawArtistModel } from '#modules/artists/models'
 import type { z } from 'zod'
 
-export const createArtistPayload = (artist: z.infer<typeof ArtistAPIResponseModel>): z.infer<typeof ArtistModel> => ({
+export const createArtistPayload = (artist: z.infer<typeof RawArtistModel>): z.infer<typeof ArtistModel> => ({
   id: artist.artistId || artist.id,
   name: artist.name,
   url: artist.urls?.overview || artist.perma_url,
@@ -51,9 +46,7 @@ export const createArtistPayload = (artist: z.infer<typeof ArtistAPIResponseMode
     })) || null
 })
 
-export const createArtistMapPayload = (
-  artist: z.infer<typeof ArtistMapAPIResponseModel>
-): z.infer<typeof ArtistMapModel> => ({
+export const createArtistMapPayload = (artist: z.infer<typeof RawArtistMapModel>): z.infer<typeof ArtistMapModel> => ({
   id: artist.id,
   name: artist.name,
   role: artist.role,

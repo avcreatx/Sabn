@@ -1,10 +1,9 @@
 import { HTTPException } from 'hono/http-exception'
-import { UseCase } from '#common/classes'
+import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { useFetch } from '#common/helpers'
 import { createPlaylistPayload } from '#modules/playlists/playlist.helper'
-import type { PlaylistAPIResponseModel, PlaylistModel } from '#modules/playlists/playlist.model'
-import type { z } from 'zod'
+import { PlaylistModel, RawPlaylistModel } from '#modules/playlists/playlist.model'
 
 export interface GetPlaylistByLinkArgs {
   token: string
@@ -12,16 +11,17 @@ export interface GetPlaylistByLinkArgs {
   page: number
 }
 
-export class GetPlaylistByLinkUseCase extends UseCase<GetPlaylistByLinkArgs, z.infer<typeof PlaylistModel>> {
+export class GetPlaylistByLinkUseCase extends useCase(PlaylistModel) {
   async execute({ token, limit, page }: GetPlaylistByLinkArgs) {
-    const data = await useFetch<z.infer<typeof PlaylistAPIResponseModel>>({
+    const data = await useFetch({
       endpoint: Endpoints.playlists.link,
       params: {
         token,
         n: limit,
         p: page,
         type: 'playlist'
-      }
+      },
+      schema: RawPlaylistModel
     })
 
     if (!data) throw new HTTPException(404, { message: 'playlist not found' })

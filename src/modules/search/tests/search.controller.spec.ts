@@ -9,7 +9,6 @@ describe('SearchController', () => {
 
   beforeAll(() => {
     controller = new SearchController()
-    controller.initRoutes()
   })
 
   const body = async (path: string) => {

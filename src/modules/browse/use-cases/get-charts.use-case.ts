@@ -1,12 +1,12 @@
-import { UseCase } from '#common/classes'
+import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { toPage, useFetch } from '#common/helpers'
+import { paginated, PlaylistSummaryModel, type PaginationArgs } from '#common/models'
 import { toPlaylistSummary } from '#modules/browse/browse.helper'
 import { FeedListAPIResponseModel } from '#modules/browse/models'
-import type { Paginated, PaginationArgs, PlaylistSummary } from '#common/models'
 
-export class GetChartsUseCase extends UseCase<PaginationArgs, Paginated<PlaylistSummary>> {
-  async execute({ page, limit }: PaginationArgs): Promise<Paginated<PlaylistSummary>> {
+export class GetChartsUseCase extends useCase(paginated(PlaylistSummaryModel)) {
+  async execute({ page, limit }: PaginationArgs) {
     const data = await useFetch({
       endpoint: Endpoints.browse.charts,
       params: {},

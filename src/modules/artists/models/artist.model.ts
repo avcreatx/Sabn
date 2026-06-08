@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import { DownloadLinkModel } from '#common/models'
-import { AlbumAPIResponseModel, AlbumModel } from '#modules/albums/album.model'
-import { SongAPIResponseModel, SongModel } from '#modules/songs/models'
+import { AlbumModel, RawAlbumModel } from '#modules/albums/album.model'
+import { RawSongModel, SongModel } from '#modules/songs/models'
 
-export const ArtistAPIResponseModel = z
+export const RawArtistModel = z
   .object({
     artistId: z.string(),
     name: z.string(),
@@ -14,9 +14,9 @@ export const ArtistAPIResponseModel = z
     isVerified: z.boolean(),
     dominantLanguage: z.string(),
     dominantType: z.string(),
-    topSongs: z.array(SongAPIResponseModel),
-    topAlbums: z.array(AlbumAPIResponseModel),
-    singles: z.array(SongAPIResponseModel),
+    topSongs: z.array(RawSongModel),
+    topAlbums: z.array(RawAlbumModel),
+    singles: z.array(RawSongModel),
     dedicated_artist_playlist: z.array(
       z.object({
         id: z.string(),

@@ -1,21 +1,21 @@
 import { z } from 'zod'
-import { UseCase } from '#common/classes'
+import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { toPage, useFetch } from '#common/helpers'
-import { SongAPIResponseModel, type SongModel } from '#modules/songs/models'
+import { paginated } from '#common/models'
+import { RawSongModel, SongModel } from '#modules/songs/models'
 import { createSongPayload } from '#modules/songs/song.helper'
-import type { Paginated } from '#common/models'
 import type { SearchArgs } from '#modules/search/models'
 
-export class SearchSongsUseCase extends UseCase<SearchArgs, Paginated<z.infer<typeof SongModel>>> {
-  async execute({ query, page, limit }: SearchArgs): Promise<Paginated<z.infer<typeof SongModel>>> {
+export class SearchSongsUseCase extends useCase(paginated(SongModel)) {
+  async execute({ query, page, limit }: SearchArgs) {
     const data = await useFetch({
       endpoint: Endpoints.search.songs,
       params: { q: query, p: page - 1, n: limit },
       schema: z.object({
         total: z.number(),
         start: z.number(),
-        results: z.array(SongAPIResponseModel)
+        results: z.array(RawSongModel)
       })
     })
 

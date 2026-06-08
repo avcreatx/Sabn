@@ -1,9 +1,9 @@
 import { createDownloadLinks, createImageLinks } from '#common/helpers'
 import { createArtistMapPayload } from '#modules/artists/artist.helper'
-import type { SongAPIResponseModel, SongModel } from '#modules/songs/models'
+import type { RawSongModel, SongModel } from '#modules/songs/models'
 import type { z } from 'zod'
 
-export const createSongPayload = (song: z.infer<typeof SongAPIResponseModel>): z.infer<typeof SongModel> => ({
+export const createSongPayload = (song: z.infer<typeof RawSongModel>): z.infer<typeof SongModel> => ({
   id: song.id,
   name: song.title,
   type: song.type,

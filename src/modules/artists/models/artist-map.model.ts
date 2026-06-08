@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { DownloadLinkModel } from '#common/models'
 
-export const ArtistMapAPIResponseModel = z.object({
+export const RawArtistMapModel = z.object({
   id: z.string(),
   name: z.string(),
   role: z.string(),

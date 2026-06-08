@@ -1,10 +1,11 @@
 import { HTTPException } from 'hono/http-exception'
-import { UseCase } from '#common/classes'
+import { z } from 'zod'
+import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { ApiContextEnum } from '#common/enums'
 import { useFetch } from '#common/helpers'
 
-export class CreateSongStationUseCase extends UseCase<string, string> {
+export class CreateSongStationUseCase extends useCase(z.string()) {
   async execute(songId: string) {
     const encodedSongId = JSON.stringify([encodeURIComponent(songId)])
 

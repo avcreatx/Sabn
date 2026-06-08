@@ -1,10 +1,10 @@
 import { createImageLinks } from '#common/helpers'
 import { createArtistMapPayload } from '#modules/artists/artist.helper'
 import { createSongPayload } from '#modules/songs/song.helper'
-import type { AlbumAPIResponseModel, AlbumModel } from '#modules/albums/album.model'
+import type { AlbumModel, RawAlbumModel } from '#modules/albums/album.model'
 import type { z } from 'zod'
 
-export const createAlbumPayload = (album: z.infer<typeof AlbumAPIResponseModel>): z.infer<typeof AlbumModel> => ({
+export const createAlbumPayload = (album: z.infer<typeof RawAlbumModel>): z.infer<typeof AlbumModel> => ({
   id: album.id,
   name: album.title,
   description: album.header_desc,

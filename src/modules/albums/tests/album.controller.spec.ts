@@ -7,7 +7,6 @@ describe('AlbumController', () => {
 
   beforeAll(() => {
     controller = new AlbumController()
-    controller.initRoutes()
   })
 
   it('get album by id', async () => {

@@ -10,7 +10,6 @@ export const Endpoints = {
     id: 'song.getDetails',
     link: 'webapi.get',
     suggestions: 'webradio.getSong',
-    lyrics: 'lyrics.getLyrics',
     station: 'webradio.createEntityStation'
   },
   albums: {

@@ -7,7 +7,6 @@ describe('ArtistController', () => {
 
   beforeAll(() => {
     controller = new ArtistController()
-    controller.initRoutes()
   })
 
   it('get artist by id', async () => {

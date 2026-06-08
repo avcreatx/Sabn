@@ -8,7 +8,6 @@ describe('SongController', () => {
 
   beforeAll(() => {
     controller = new SongController()
-    controller.initRoutes()
   })
 
   it('get songs by ids', async () => {

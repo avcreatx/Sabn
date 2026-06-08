@@ -7,7 +7,6 @@ describe('PlaylistController', () => {
 
   beforeAll(() => {
     controller = new PlaylistController()
-    controller.initRoutes()
   })
 
   it('get playlist by id', async () => {

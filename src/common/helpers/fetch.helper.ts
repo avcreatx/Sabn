@@ -1,7 +1,10 @@
+import { consola } from 'consola'
 import { HTTPException } from 'hono/http-exception'
 import { userAgents } from '#common/constants'
 import type { ApiContextEnum } from '#common/enums'
 import type { z } from 'zod'
+
+const logger = consola.withTag('jiosaavn:drift')
 
 interface FetchParams<T> {
   endpoint: string
@@ -51,7 +54,8 @@ export const useFetch = async <T>(args: FetchParams<T>): Promise<T> => {
   if (schema) {
     const { success, data, error } = schema.safeParse(body)
     if (success) return data
-    console.warn(`[useFetch] ${endpoint} response did not match its schema:`, error.issues)
+    const issues = error.issues.map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`)
+    logger.warn(`upstream response drift on ${endpoint}`, { issues })
   }
 
   return body as T

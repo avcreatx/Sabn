@@ -7,7 +7,6 @@ describe('ResolveController', () => {
 
   beforeAll(() => {
     controller = new ResolveController()
-    controller.initRoutes()
   })
 
   const parse = async (url: string) => {

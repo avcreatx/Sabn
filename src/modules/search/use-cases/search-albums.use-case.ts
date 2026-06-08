@@ -1,12 +1,12 @@
-import { UseCase } from '#common/classes'
+import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { toPage, useFetch } from '#common/helpers'
+import { AlbumSummaryModel, paginated } from '#common/models'
 import { SearchAlbumAPIResponseModel, type SearchArgs } from '#modules/search/models'
 import { albumResultToSummary } from '#modules/search/search.helper'
-import type { AlbumSummary, Paginated } from '#common/models'
 
-export class SearchAlbumsUseCase extends UseCase<SearchArgs, Paginated<AlbumSummary>> {
-  async execute({ query, page, limit }: SearchArgs): Promise<Paginated<AlbumSummary>> {
+export class SearchAlbumsUseCase extends useCase(paginated(AlbumSummaryModel)) {
+  async execute({ query, page, limit }: SearchArgs) {
     const data = await useFetch({
       endpoint: Endpoints.search.albums,
       params: { q: query, p: page - 1, n: limit },

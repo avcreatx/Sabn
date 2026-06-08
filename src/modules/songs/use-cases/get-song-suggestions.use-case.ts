@@ -1,10 +1,10 @@
 import { HTTPException } from 'hono/http-exception'
 import { z } from 'zod'
-import { UseCase } from '#common/classes'
+import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { ApiContextEnum } from '#common/enums'
 import { useFetch } from '#common/helpers'
-import { SongAPIResponseModel, type SongModel } from '#modules/songs/models'
+import { RawSongModel, SongModel } from '#modules/songs/models'
 import { createSongPayload } from '#modules/songs/song.helper'
 import { CreateSongStationUseCase } from '#modules/songs/use-cases'
 
@@ -13,7 +13,7 @@ export interface GetSongSuggestionsArgs {
   limit: number
 }
 
-export class GetSongSuggestionsUseCase extends UseCase<GetSongSuggestionsArgs, z.infer<typeof SongModel>[]> {
+export class GetSongSuggestionsUseCase extends useCase(z.array(SongModel)) {
   private readonly createSongStation = new CreateSongStationUseCase()
 
   async execute({ songId, limit }: GetSongSuggestionsArgs) {
@@ -26,7 +26,7 @@ export class GetSongSuggestionsUseCase extends UseCase<GetSongSuggestionsArgs, z
         k: limit
       },
       context: ApiContextEnum.ANDROID,
-      schema: z.object({ stationid: z.string() }).and(z.record(z.string(), z.object({ song: SongAPIResponseModel })))
+      schema: z.object({ stationid: z.string() }).and(z.record(z.string(), z.object({ song: RawSongModel })))
     })
 
     if (!data) {

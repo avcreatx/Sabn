@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { UseCase } from '#common/classes'
+import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { toPage, useFetch } from '#common/helpers'
-import { SongAPIResponseModel, type SongModel } from '#modules/songs/models'
+import { paginated } from '#common/models'
+import { RawSongModel, SongModel } from '#modules/songs/models'
 import { createSongPayload } from '#modules/songs/song.helper'
-import type { Paginated } from '#common/models'
 
 export interface GetArtistSongsArgs {
   artistId: string
@@ -13,13 +13,8 @@ export interface GetArtistSongsArgs {
   sortOrder: 'asc' | 'desc'
 }
 
-export class GetArtistSongsUseCase extends UseCase<GetArtistSongsArgs, Paginated<z.infer<typeof SongModel>>> {
-  async execute({
-    artistId,
-    page,
-    sortOrder,
-    sortBy
-  }: GetArtistSongsArgs): Promise<Paginated<z.infer<typeof SongModel>>> {
+export class GetArtistSongsUseCase extends useCase(paginated(SongModel)) {
+  async execute({ artistId, page, sortOrder, sortBy }: GetArtistSongsArgs) {
     const data = await useFetch({
       endpoint: Endpoints.artists.songs,
       params: { artistId, page: page - 1, sort_order: sortOrder, category: sortBy },
@@ -34,7 +29,7 @@ export class GetArtistSongsUseCase extends UseCase<GetArtistSongsArgs, Paginated
         dominantLanguage: z.string(),
         dominantType: z.string(),
         topSongs: z.object({
-          songs: z.array(SongAPIResponseModel),
+          songs: z.array(RawSongModel),
           total: z.number()
         })
       })

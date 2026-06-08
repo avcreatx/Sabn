@@ -1,10 +1,10 @@
 import { HTTPException } from 'hono/http-exception'
-import { UseCase } from '#common/classes'
+import { useCase } from '#common/classes'
 import { AlbumService } from '#modules/albums/album.service'
 import { ArtistService } from '#modules/artists/artist.service'
 import { PlaylistService } from '#modules/playlists/playlist.service'
+import { ResolveResultModel } from '#modules/resolve/resolve.model'
 import { SongService } from '#modules/songs/song.service'
-import type { ResolveResult } from '#modules/resolve/resolve.model'
 
 // Maps a JioSaavn URL shape to its entity type + perma-token.
 const RESOLVERS = [
@@ -14,13 +14,13 @@ const RESOLVERS = [
   { type: 'playlist', regex: /(?:jiosaavn|saavn)\.com\/(?:featured|s\/playlist)\/[^/]+\/([^/]+)/ }
 ] as const
 
-export class ResolveUseCase extends UseCase<string, ResolveResult> {
+export class ResolveUseCase extends useCase(ResolveResultModel) {
   private readonly songService = new SongService()
   private readonly albumService = new AlbumService()
   private readonly artistService = new ArtistService()
   private readonly playlistService = new PlaylistService()
 
-  async execute(url: string): Promise<ResolveResult> {
+  async execute(url: string) {
     for (const { type, regex } of RESOLVERS) {
       const token = url.match(regex)?.[1]
       if (!token) continue
