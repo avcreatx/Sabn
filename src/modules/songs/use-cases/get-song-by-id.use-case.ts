@@ -15,7 +15,7 @@ export class GetSongByIdsUseCase extends useCase(z.array(SongModel)) {
     const data = await useFetch({
       endpoint: Endpoints.songs.id,
       params: { pids: songIds },
-      schema: z.object({ songs: z.array(RawSongModel) })
+      schema: z.object({ songs: z.array(RawSongModel).optional() })
     })
 
     if (!data.songs?.length) throw new HTTPException(404, { message: 'song not found' })

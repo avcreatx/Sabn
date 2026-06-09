@@ -11,11 +11,13 @@ export class GetSongByLinkUseCase extends useCase(z.array(SongModel)) {
     const data = await useFetch({
       endpoint: Endpoints.songs.link,
       params: { token, type: 'song' },
-      schema: z.object({ songs: z.array(RawSongModel) })
+      schema: z.union([z.object({ songs: z.array(RawSongModel).optional() }), z.array(RawSongModel)])
     })
 
-    if (!data.songs?.length) throw new HTTPException(404, { message: 'song not found' })
+    const songs = Array.isArray(data) ? data : (data.songs ?? [])
 
-    return data.songs.map((song) => createSongPayload(song))
+    if (!songs.length) throw new HTTPException(404, { message: 'song not found' })
+
+    return songs.map((song) => createSongPayload(song))
   }
 }

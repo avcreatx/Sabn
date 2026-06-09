@@ -1,4 +1,5 @@
 import { HTTPException } from 'hono/http-exception'
+import { z } from 'zod'
 import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { useFetch } from '#common/helpers'
@@ -13,11 +14,13 @@ export class GetAlbumByLinkUseCase extends useCase(AlbumModel) {
         token,
         type: 'album'
       },
-      schema: RawAlbumModel
+      schema: z.union([RawAlbumModel, z.array(RawAlbumModel)])
     })
 
-    if (!data) throw new HTTPException(404, { message: 'album not found' })
+    const entity = Array.isArray(data) ? data[0] : data
 
-    return createAlbumPayload(data)
+    if (!entity) throw new HTTPException(404, { message: 'album not found' })
+
+    return createAlbumPayload(entity)
   }
 }

@@ -1,4 +1,5 @@
 import { HTTPException } from 'hono/http-exception'
+import { z } from 'zod'
 import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { useFetch } from '#common/helpers'
@@ -21,12 +22,14 @@ export class GetPlaylistByLinkUseCase extends useCase(PlaylistModel) {
         p: page,
         type: 'playlist'
       },
-      schema: RawPlaylistModel
+      schema: z.union([RawPlaylistModel, z.array(RawPlaylistModel)])
     })
 
-    if (!data) throw new HTTPException(404, { message: 'playlist not found' })
+    const entity = Array.isArray(data) ? data[0] : data
 
-    const playlist = createPlaylistPayload(data)
+    if (!entity) throw new HTTPException(404, { message: 'playlist not found' })
+
+    const playlist = createPlaylistPayload(entity)
 
     return {
       ...playlist,
