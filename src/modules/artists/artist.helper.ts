@@ -1,49 +1,45 @@
 import { createImageLinks } from '#common/helpers'
-import { safeJsonParse } from '#common/utils'
+import { safeJsonParse, toList, toNumber, toText } from '#common/utils'
 import { createAlbumPayload } from '#modules/albums/album.helper'
 import { createSongPayload } from '#modules/songs/song.helper'
 import type { ArtistMapModel, ArtistModel, RawArtistMapModel, RawArtistModel } from '#modules/artists/models'
 import type { z } from 'zod'
 
 export const createArtistPayload = (artist: z.infer<typeof RawArtistModel>): z.infer<typeof ArtistModel> => ({
-  id: artist.artistId || artist.id,
+  id: artist.artistId || artist.id || '',
   name: artist.name,
-  url: artist.urls?.overview || artist.perma_url,
+  url: artist.urls?.overview || artist.perma_url || '',
   type: artist.type,
-  followerCount: artist.follower_count ? Number(artist.follower_count) : null,
-  fanCount: artist.fan_count || null,
+  followerCount: toNumber(artist.follower_count),
+  fanCount: toNumber(artist.fan_count),
   isVerified: artist.isVerified || null,
-  dominantLanguage: artist.dominantLanguage || null,
-  dominantType: artist.dominantType || null,
+  dominantLanguage: toText(artist.dominantLanguage),
+  dominantType: toText(artist.dominantType),
   bio: safeJsonParse(artist.bio),
-  dob: artist.dob || null,
-  fb: artist.fb || null,
-  twitter: artist.twitter || null,
-  wiki: artist.wiki || null,
-  availableLanguages: artist.availableLanguages || null,
+  dob: toText(artist.dob),
+  fb: toText(artist.fb),
+  twitter: toText(artist.twitter),
+  wiki: toText(artist.wiki),
+  availableLanguages: artist.availableLanguages ?? [],
   isRadioPresent: artist.isRadioPresent || null,
   image: createImageLinks(artist.image),
-  topSongs: artist.topSongs?.map(createSongPayload) || null,
-  topAlbums: artist.topAlbums?.map(createAlbumPayload) || null,
-  singles: artist.singles?.map(createSongPayload) || null,
-  similarArtists:
-    artist.similarArtists?.map((similarArtist) => ({
-      id: similarArtist.id,
-      name: similarArtist.name,
-      url: similarArtist.perma_url,
-      image: createImageLinks(similarArtist.image_url),
-      languages: safeJsonParse(similarArtist.languages),
-      wiki: similarArtist.wiki,
-      dob: similarArtist.dob,
-      fb: similarArtist.fb,
-      twitter: similarArtist.twitter,
-      isRadioPresent: similarArtist.isRadioPresent,
-      type: similarArtist.type,
-      dominantType: similarArtist.dominantType,
-      aka: similarArtist.aka,
-      bio: safeJsonParse(similarArtist.bio),
-      similarArtists: safeJsonParse(similarArtist.similar)
-    })) || null
+  topSongs: toList(artist.topSongs, createSongPayload),
+  topAlbums: toList(artist.topAlbums, createAlbumPayload),
+  singles: toList(artist.singles, createSongPayload),
+  latestRelease: toList(artist.latest_release, (r) => ({
+    id: r.id,
+    name: r.title,
+    type: r.type,
+    url: r.perma_url,
+    image: createImageLinks(r.image)
+  })),
+  similarArtists: toList(artist.similarArtists, (s) => ({
+    id: s.id,
+    name: s.name,
+    url: s.perma_url,
+    image: createImageLinks(s.image_url),
+    type: s.type
+  }))
 })
 
 export const createArtistMapPayload = (artist: z.infer<typeof RawArtistMapModel>): z.infer<typeof ArtistMapModel> => ({

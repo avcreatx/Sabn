@@ -1,4 +1,5 @@
 import { createImageLinks } from '#common/helpers'
+import { toBoolean, toList, toNumber, toText } from '#common/utils'
 import { createArtistMapPayload } from '#modules/artists/artist.helper'
 import { createSongPayload } from '#modules/songs/song.helper'
 import type { PlaylistModel, RawPlaylistModel } from '#modules/playlists/playlist.model'
@@ -7,15 +8,22 @@ import type { z } from 'zod'
 export const createPlaylistPayload = (playlist: z.infer<typeof RawPlaylistModel>): z.infer<typeof PlaylistModel> => ({
   id: playlist.id,
   name: playlist.title,
-  description: playlist.header_desc,
+  description: toText(playlist.header_desc),
   type: playlist.type,
-  year: playlist.year ? Number(playlist.year) : null,
-  playCount: playlist.play_count ? Number(playlist.play_count) : null,
+  year: toNumber(playlist.year),
+  playCount: toNumber(playlist.play_count),
   language: playlist.language,
-  explicitContent: playlist.explicit_content === '1',
+  explicitContent: toBoolean(playlist.explicit_content),
   url: playlist.perma_url,
-  songCount: playlist.list_count ? Number(playlist.list_count) : null,
-  artists: playlist.more_info.artists?.map(createArtistMapPayload) || null,
+  songCount: toNumber(playlist.list_count),
+  followerCount: toNumber(playlist.more_info?.follower_count),
+  lastUpdated: toText(playlist.more_info?.last_updated),
+  owner: {
+    id: toText(playlist.more_info?.uid),
+    name: toText([playlist.more_info?.firstname, playlist.more_info?.lastname].filter(Boolean).join(' ')),
+    username: toText(playlist.more_info?.username)
+  },
+  artists: toList(playlist.more_info?.artists, createArtistMapPayload),
   image: createImageLinks(playlist.image),
-  songs: (playlist.list && playlist.list?.map(createSongPayload)) || null
+  songs: toList(playlist.list, createSongPayload)
 })

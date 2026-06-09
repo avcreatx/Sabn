@@ -1,4 +1,5 @@
 import { createImageLinks } from '#common/helpers'
+import { toBoolean, toNumber, toText } from '#common/utils'
 import type {
   AlbumSummary,
   ArtistSummary,
@@ -10,20 +11,16 @@ import type {
 import type { FeedItem, LaunchDataAPIResponseModel, ModulesModel } from '#modules/browse/models'
 import type { z } from 'zod'
 
-const num = (v?: string) => (v != null && v !== '' ? Number(v) : null)
-const str = (v?: string) => (v != null && v !== '' ? v : null)
-const isExplicit = (v?: string) => v === '1'
-
 export const toSongSummary = (i: FeedItem): SongSummary => ({
   type: 'song',
   id: i.id,
   name: i.title,
   url: i.perma_url,
   image: createImageLinks(i.image),
-  album: str(i.more_info?.album),
-  artists: str(i.more_info?.primary_artists),
-  language: str(i.more_info?.language),
-  explicitContent: isExplicit(i.explicit_content)
+  album: toText(i.more_info?.album),
+  artists: toText(i.more_info?.primary_artists),
+  language: toText(i.more_info?.language),
+  explicitContent: toBoolean(i.explicit_content)
 })
 
 export const toAlbumSummary = (i: FeedItem): AlbumSummary => ({
@@ -32,11 +29,11 @@ export const toAlbumSummary = (i: FeedItem): AlbumSummary => ({
   name: i.title,
   url: i.perma_url,
   image: createImageLinks(i.image),
-  artist: str(i.more_info?.music),
-  year: str(i.more_info?.year),
-  songCount: num(i.more_info?.song_count),
-  language: str(i.more_info?.language),
-  explicitContent: isExplicit(i.explicit_content)
+  artist: toText(i.more_info?.music),
+  year: toText(i.more_info?.year),
+  songCount: toNumber(i.more_info?.song_count),
+  language: toText(i.more_info?.language),
+  explicitContent: toBoolean(i.explicit_content)
 })
 
 export const toArtistSummary = (i: FeedItem): ArtistSummary => ({
@@ -45,7 +42,7 @@ export const toArtistSummary = (i: FeedItem): ArtistSummary => ({
   name: i.title,
   url: i.perma_url,
   image: createImageLinks(i.image),
-  role: str(i.subtitle)
+  role: toText(i.subtitle)
 })
 
 export const toPlaylistSummary = (i: FeedItem): PlaylistSummary => ({
@@ -54,10 +51,10 @@ export const toPlaylistSummary = (i: FeedItem): PlaylistSummary => ({
   name: i.title,
   url: i.perma_url,
   image: createImageLinks(i.image),
-  songCount: num(i.more_info?.song_count) ?? i.count ?? null,
-  followerCount: num(i.more_info?.follower_count),
-  language: str(i.more_info?.language),
-  explicitContent: isExplicit(i.explicit_content)
+  songCount: toNumber(i.more_info?.song_count) ?? i.count ?? null,
+  followerCount: toNumber(i.more_info?.follower_count),
+  language: toText(i.more_info?.language),
+  explicitContent: toBoolean(i.explicit_content)
 })
 
 export const toRadioStationSummary = (i: FeedItem): RadioStationSummary => ({
@@ -66,7 +63,7 @@ export const toRadioStationSummary = (i: FeedItem): RadioStationSummary => ({
   name: i.title,
   url: i.perma_url,
   image: createImageLinks(i.image),
-  subtitle: str(i.subtitle)
+  subtitle: toText(i.subtitle)
 })
 
 /** Maps any feed item to its typed card, or null for unsupported types. */
@@ -95,7 +92,7 @@ export const toCards = (items: FeedItem[] = []): EntityCard[] =>
 export const createModulesPayload = (
   data: z.infer<typeof LaunchDataAPIResponseModel>
 ): z.infer<typeof ModulesModel> => ({
-  trending: toCards(data.new_trending),
+  trending: toCards(data.new_trending ?? []),
   albums: (data.new_albums ?? []).map(toAlbumSummary),
   playlists: (data.top_playlists ?? []).map(toPlaylistSummary),
   charts: (data.charts ?? []).map(toPlaylistSummary),
