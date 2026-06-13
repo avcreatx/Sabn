@@ -29,7 +29,7 @@ export const FeedItemAPIResponseModel = z.object({
       album_url: z.string(),
       primary_artists: z.string(),
       singers: z.string(),
-      artistMap: RawArtistMapGroupModel
+      artistMap: z.union([RawArtistMapGroupModel, z.array(z.unknown())])
     })
     .partial()
     .nullish()

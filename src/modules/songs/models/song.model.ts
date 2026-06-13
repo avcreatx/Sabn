@@ -12,7 +12,7 @@ export const RawSongModel = z.object({
   image: z.string().nullish(),
   language: z.string(),
   year: z.string().nullish(),
-  play_count: z.string().nullish(),
+  play_count: z.coerce.string().nullish(),
   explicit_content: z.string().nullish(),
   list_count: z.string().nullish(),
   list_type: z.string().nullish(),
