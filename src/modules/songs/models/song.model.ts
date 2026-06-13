@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { DownloadLinkModel, ImageLinkModel } from '#common/models'
-import { ArtistMapGroupModel, RawArtistMapGroupModel } from '#modules/artists/models'
+import { ArtistMapGroupModel, RawArtistMapGroupModel } from '#modules/artists/models/artist-map.model'
 
 export const RawSongModel = z.object({
   id: z.string(),
@@ -59,16 +59,21 @@ export const RawSongModel = z.object({
 export const SongModel = z.object({
   id: z.string(),
   name: z.string(),
+  subtitle: z.string().nullable(),
   type: z.string(),
   year: z.number().nullable(),
   releaseDate: z.string().nullable(),
   duration: z.number().nullable(),
   label: z.string().nullable(),
+  labelUrl: z.string().nullable(),
   explicitContent: z.boolean(),
+  isDolbyContent: z.boolean().nullable(),
+  has320kbps: z.boolean(),
   playCount: z.number().nullable(),
   language: z.string(),
   hasLyrics: z.boolean(),
   lyricsId: z.string().nullable(),
+  lyricsSnippet: z.string().nullable(),
   url: z.string(),
   copyright: z.string().nullable(),
   album: z.object({

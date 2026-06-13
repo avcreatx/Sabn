@@ -24,7 +24,8 @@ export const RawAlbumModel = z.object({
       song_count: z.string().nullish(),
       copyright_text: z.string().nullish(),
       is_dolby_content: z.boolean().nullish(),
-      label_url: z.string().nullish()
+      label_url: z.string().nullish(),
+      release_date: z.string().nullish()
     })
     .nullish()
 })
@@ -32,15 +33,19 @@ export const RawAlbumModel = z.object({
 export const AlbumModel = z.object({
   id: z.string(),
   name: z.string(),
+  subtitle: z.string().nullable(),
   description: z.string().nullable(),
   year: z.number().nullable(),
+  releaseDate: z.string().nullable(),
   type: z.string(),
   playCount: z.number().nullable(),
   language: z.string(),
   explicitContent: z.boolean(),
+  isDolbyContent: z.boolean().nullable(),
   artists: ArtistMapGroupModel,
   songCount: z.number().nullable(),
   url: z.string(),
+  labelUrl: z.string().nullable(),
   copyright: z.string().nullable(),
   image: z.array(DownloadLinkModel),
   songs: z.array(SongModel)

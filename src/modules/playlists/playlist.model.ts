@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { DownloadLinkModel, ImageLinkModel } from '#common/models'
-import { ArtistMapModel, RawArtistMapModel } from '#modules/artists/models'
+import { ArtistMapModel, RawArtistMapModel } from '#modules/artists/models/artist-map.model'
 import { RawSongModel, SongModel } from '#modules/songs/models'
 
 export const RawPlaylistModel = z.object({
@@ -17,6 +17,7 @@ export const RawPlaylistModel = z.object({
   explicit_content: z.string().nullish(),
   list_count: z.string().nullish(),
   list_type: z.string().nullish(),
+  subtitle_desc: z.array(z.string()).nullish(),
   list: z.array(RawSongModel).nullish(),
   more_info: z
     .object({
@@ -46,15 +47,20 @@ export const RawPlaylistModel = z.object({
 export const PlaylistModel = z.object({
   id: z.string(),
   name: z.string(),
+  subtitle: z.string().nullable(),
   description: z.string().nullable(),
+  subtitleDescriptions: z.array(z.string()),
   year: z.number().nullable(),
   type: z.string(),
   playCount: z.number().nullable(),
   language: z.string(),
   explicitContent: z.boolean(),
+  isDolbyContent: z.boolean().nullable(),
   songCount: z.number().nullable(),
   url: z.string(),
   followerCount: z.number().nullable(),
+  fanCount: z.number().nullable(),
+  videoCount: z.number().nullable(),
   lastUpdated: z.string().nullable(),
   owner: z
     .object({ id: z.string().nullable(), name: z.string().nullable(), username: z.string().nullable() })
