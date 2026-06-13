@@ -1,9 +1,10 @@
 import { createRoute } from '@hono/zod-openapi'
 import { Controller } from '#common/classes'
 import { openApiJsonResponse, openApiPaginatedResponse } from '#common/helpers'
-import { EntityCardModel, PaginationQuery, PlaylistSummaryModel } from '#common/models'
+import { PaginationQuery } from '#common/models'
 import { BrowseService } from '#modules/browse/browse.service'
-import { ModulesModel } from '#modules/browse/models'
+import { EntityCardModel, ModulesModel } from '#modules/browse/models'
+import { PlaylistSummaryModel } from '#modules/playlists/playlist.model'
 
 export class BrowseController extends Controller {
   private readonly browseService = new BrowseService()

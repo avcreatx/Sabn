@@ -1,12 +1,10 @@
 import { z } from 'zod'
-import {
-  AlbumSummaryModel,
-  ArtistSummaryModel,
-  EntityCardModel,
-  PaginationQuery,
-  PlaylistSummaryModel,
-  SongSummaryModel
-} from '#common/models'
+import { PaginationQuery } from '#common/models'
+import { AlbumSummaryModel } from '#modules/albums/album.model'
+import { ArtistSummaryModel } from '#modules/artists/models'
+import { EntityCardModel } from '#modules/browse/models'
+import { PlaylistSummaryModel } from '#modules/playlists/playlist.model'
+import { SongSummaryModel } from '#modules/songs/models'
 
 export const SearchAPIResponseModel = z.object({
   albums: z.object({
@@ -152,5 +150,3 @@ export const SearchResultModel = z.object({
 export const SearchQuery = PaginationQuery.extend({
   query: z.string().min(1)
 })
-
-export type SearchArgs = z.infer<typeof SearchQuery>
