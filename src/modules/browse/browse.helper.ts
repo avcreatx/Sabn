@@ -1,97 +1,103 @@
 import { createImageLinks } from '#common/helpers'
 import { toBoolean, toNumber, toText } from '#common/utils'
+import { toArtists } from '#modules/artists/artist.helper'
+import type { AlbumSummaryModel } from '#modules/albums/album.model'
+import type { ArtistSummaryModel } from '#modules/artists/models'
 import type {
-  AlbumSummary,
-  ArtistSummary,
-  EntityCard,
-  PlaylistSummary,
-  RadioStationSummary,
-  SongSummary
-} from '#common/models'
-import type { FeedItem, LaunchDataAPIResponseModel, ModulesModel } from '#modules/browse/models'
+  EntityCardModel,
+  FeedItemAPIResponseModel,
+  LaunchDataAPIResponseModel,
+  ModulesModel,
+  RadioStationSummaryModel
+} from '#modules/browse/models'
+import type { PlaylistSummaryModel } from '#modules/playlists/playlist.model'
+import type { SongSummaryModel } from '#modules/songs/models'
 import type { z } from 'zod'
 
-export const toSongSummary = (i: FeedItem): SongSummary => ({
+export const toSongSummary = (item: z.infer<typeof FeedItemAPIResponseModel>): z.infer<typeof SongSummaryModel> => ({
   type: 'song',
-  id: i.id,
-  name: i.title,
-  url: i.perma_url,
-  image: createImageLinks(i.image),
-  album: toText(i.more_info?.album),
-  artists: toText(i.more_info?.primary_artists),
-  language: toText(i.more_info?.language),
-  explicitContent: toBoolean(i.explicit_content)
+  id: item.id,
+  name: item.title,
+  url: item.perma_url,
+  image: createImageLinks(item.image),
+  album: toText(item.more_info?.album),
+  artists: toArtists(item.more_info?.artistMap, item.more_info?.primary_artists),
+  language: toText(item.language),
+  explicitContent: toBoolean(item.explicit_content)
 })
 
-export const toAlbumSummary = (i: FeedItem): AlbumSummary => ({
+export const toAlbumSummary = (item: z.infer<typeof FeedItemAPIResponseModel>): z.infer<typeof AlbumSummaryModel> => ({
   type: 'album',
-  id: i.id,
-  name: i.title,
-  url: i.perma_url,
-  image: createImageLinks(i.image),
-  artist: toText(i.more_info?.music),
-  year: toText(i.more_info?.year),
-  songCount: toNumber(i.more_info?.song_count),
-  language: toText(i.more_info?.language),
-  explicitContent: toBoolean(i.explicit_content)
+  id: item.id,
+  name: item.title,
+  url: item.perma_url,
+  image: createImageLinks(item.image),
+  artists: toArtists(item.more_info?.artistMap, item.more_info?.music),
+  year: toText(item.year),
+  songCount: toNumber(item.more_info?.song_count),
+  language: toText(item.language),
+  explicitContent: toBoolean(item.explicit_content)
 })
 
-export const toArtistSummary = (i: FeedItem): ArtistSummary => ({
+export const toArtistSummary = (
+  item: z.infer<typeof FeedItemAPIResponseModel>
+): z.infer<typeof ArtistSummaryModel> => ({
   type: 'artist',
-  id: i.id,
-  name: i.title,
-  url: i.perma_url,
-  image: createImageLinks(i.image),
-  role: toText(i.subtitle)
+  id: item.id,
+  name: item.title,
+  url: item.perma_url,
+  image: createImageLinks(item.image),
+  role: toText(item.subtitle)
 })
 
-export const toPlaylistSummary = (i: FeedItem): PlaylistSummary => ({
+export const toPlaylistSummary = (
+  item: z.infer<typeof FeedItemAPIResponseModel>
+): z.infer<typeof PlaylistSummaryModel> => ({
   type: 'playlist',
-  id: i.id,
-  name: i.title,
-  url: i.perma_url,
-  image: createImageLinks(i.image),
-  songCount: toNumber(i.more_info?.song_count) ?? i.count ?? null,
-  followerCount: toNumber(i.more_info?.follower_count),
-  language: toText(i.more_info?.language),
-  explicitContent: toBoolean(i.explicit_content)
+  id: item.id,
+  name: item.title,
+  url: item.perma_url,
+  image: createImageLinks(item.image),
+  songCount: toNumber(item.more_info?.song_count) ?? item.count ?? null,
+  followerCount: toNumber(item.more_info?.follower_count),
+  language: toText(item.language),
+  explicitContent: toBoolean(item.explicit_content)
 })
 
-export const toRadioStationSummary = (i: FeedItem): RadioStationSummary => ({
+export const toRadioStationSummary = (
+  item: z.infer<typeof FeedItemAPIResponseModel>
+): z.infer<typeof RadioStationSummaryModel> => ({
   type: 'radio_station',
-  id: i.id,
-  name: i.title,
-  url: i.perma_url,
-  image: createImageLinks(i.image),
-  subtitle: toText(i.subtitle)
+  id: item.id,
+  name: item.title,
+  url: item.perma_url,
+  image: createImageLinks(item.image),
+  subtitle: toText(item.subtitle)
 })
 
-/** Maps any feed item to its typed card, or null for unsupported types. */
-export const toCard = (i: FeedItem): EntityCard | null => {
-  switch (i.type) {
+export const toCard = (item: z.infer<typeof FeedItemAPIResponseModel>): z.infer<typeof EntityCardModel> | null => {
+  switch (item.type) {
     case 'song':
-      return toSongSummary(i)
+      return toSongSummary(item)
     case 'album':
-      return toAlbumSummary(i)
+      return toAlbumSummary(item)
     case 'artist':
-      return toArtistSummary(i)
+      return toArtistSummary(item)
     case 'playlist':
-      return toPlaylistSummary(i)
+      return toPlaylistSummary(item)
     case 'radio_station':
     case 'station':
     case 'featured_station':
-      return toRadioStationSummary(i)
+      return toRadioStationSummary(item)
     default:
       return null
   }
 }
 
-export const toCards = (items: FeedItem[] = []): EntityCard[] =>
-  items.map(toCard).filter((c): c is EntityCard => c !== null)
+export const toCards = (items: z.infer<typeof FeedItemAPIResponseModel>[] = []): z.infer<typeof EntityCardModel>[] =>
+  items.map(toCard).filter((card): card is z.infer<typeof EntityCardModel> => card !== null)
 
-export const createModulesPayload = (
-  data: z.infer<typeof LaunchDataAPIResponseModel>
-): z.infer<typeof ModulesModel> => ({
+export const toModules = (data: z.infer<typeof LaunchDataAPIResponseModel>): z.infer<typeof ModulesModel> => ({
   trending: toCards(data.new_trending ?? []),
   albums: (data.new_albums ?? []).map(toAlbumSummary),
   playlists: (data.top_playlists ?? []).map(toPlaylistSummary),

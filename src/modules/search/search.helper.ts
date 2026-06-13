@@ -1,6 +1,10 @@
 import { createImageLinks } from '#common/helpers'
 import { toBoolean, toNumber, toText } from '#common/utils'
-import type { AlbumSummary, ArtistSummary, EntityCard, PlaylistSummary, SongSummary } from '#common/models'
+import { toArtists } from '#modules/artists/artist.helper'
+import type { AlbumSummaryModel } from '#modules/albums/album.model'
+import type { ArtistSummaryModel } from '#modules/artists/models'
+import type { EntityCardModel } from '#modules/browse/models'
+import type { PlaylistSummaryModel } from '#modules/playlists/playlist.model'
 import type {
   SearchAlbumAPIResponseModel,
   SearchAPIResponseModel,
@@ -8,72 +12,72 @@ import type {
   SearchPlaylistAPIResponseModel,
   SearchResultModel
 } from '#modules/search/models'
+import type { SongSummaryModel } from '#modules/songs/models'
 import type { z } from 'zod'
 
-type AlbumResult = z.infer<typeof SearchAlbumAPIResponseModel>['results'][number]
-type ArtistResult = z.infer<typeof SearchArtistAPIResponseModel>['results'][number]
-type PlaylistResult = z.infer<typeof SearchPlaylistAPIResponseModel>['results'][number]
-type TopQueryItem = z.infer<typeof SearchAPIResponseModel>['topquery']['data'][number]
-
-// ---- per-type search results → summaries ----
-
-export const albumResultToSummary = (i: AlbumResult): AlbumSummary => ({
+export const toAlbumSummary = (
+  item: z.infer<typeof SearchAlbumAPIResponseModel>['results'][number]
+): z.infer<typeof AlbumSummaryModel> => ({
   type: 'album',
-  id: i.id,
-  name: i.title,
-  url: i.perma_url,
-  image: createImageLinks(i.image),
-  artist: toText(i.more_info?.music),
-  year: toText(i.year),
-  songCount: toNumber(i.more_info?.song_count),
-  language: toText(i.language),
-  explicitContent: toBoolean(i.explicit_content)
+  id: item.id,
+  name: item.title,
+  url: item.perma_url,
+  image: createImageLinks(item.image),
+  artists: toArtists(item.more_info?.artistMap, item.more_info?.music),
+  year: toText(item.year),
+  songCount: toNumber(item.more_info?.song_count),
+  language: toText(item.language),
+  explicitContent: toBoolean(item.explicit_content)
 })
 
-export const artistResultToSummary = (i: ArtistResult): ArtistSummary => ({
+export const toArtistSummary = (
+  item: z.infer<typeof SearchArtistAPIResponseModel>['results'][number]
+): z.infer<typeof ArtistSummaryModel> => ({
   type: 'artist',
-  id: i.id,
-  name: i.name,
-  url: i.perma_url,
-  image: createImageLinks(i.image),
-  role: toText(i.role)
+  id: item.id,
+  name: item.name,
+  url: item.perma_url,
+  image: createImageLinks(item.image),
+  role: toText(item.role)
 })
 
-export const playlistResultToSummary = (i: PlaylistResult): PlaylistSummary => ({
+export const toPlaylistSummary = (
+  item: z.infer<typeof SearchPlaylistAPIResponseModel>['results'][number]
+): z.infer<typeof PlaylistSummaryModel> => ({
   type: 'playlist',
-  id: i.id,
-  name: i.title,
-  url: i.perma_url,
-  image: createImageLinks(i.image),
-  songCount: toNumber(i.more_info?.song_count),
+  id: item.id,
+  name: item.title,
+  url: item.perma_url,
+  image: createImageLinks(item.image),
+  songCount: toNumber(item.more_info?.song_count),
   followerCount: null,
-  language: toText(i.more_info?.language),
-  explicitContent: toBoolean(i.explicit_content)
+  language: toText(item.more_info?.language),
+  explicitContent: toBoolean(item.explicit_content)
 })
 
-// ---- global search (autocomplete) → grouped summaries + top cards ----
-
-const topQueryToCard = (i: TopQueryItem): EntityCard | null => {
-  const card = { id: i.id, name: i.title, url: i.perma_url ?? '', image: createImageLinks(i.image) }
-  switch (i.type) {
+const toCard = (
+  item: z.infer<typeof SearchAPIResponseModel>['topquery']['data'][number]
+): z.infer<typeof EntityCardModel> | null => {
+  const card = { id: item.id, name: item.title, url: item.perma_url ?? '', image: createImageLinks(item.image) }
+  switch (item.type) {
     case 'song':
       return {
         type: 'song',
         ...card,
-        album: toText(i.more_info?.album),
-        artists: toText(i.more_info?.primary_artists),
-        language: toText(i.more_info?.language),
-        explicitContent: toBoolean(i.explicit_content)
+        album: toText(item.more_info?.album),
+        artists: toArtists(undefined, item.more_info?.primary_artists),
+        language: toText(item.more_info?.language),
+        explicitContent: toBoolean(item.explicit_content)
       }
     case 'album':
       return {
         type: 'album',
         ...card,
-        artist: null,
+        artists: [],
         year: null,
         songCount: null,
-        language: toText(i.more_info?.language),
-        explicitContent: toBoolean(i.explicit_content)
+        language: toText(item.more_info?.language),
+        explicitContent: toBoolean(item.explicit_content)
       }
     case 'artist':
       return { type: 'artist', ...card, role: null }
@@ -83,66 +87,64 @@ const topQueryToCard = (i: TopQueryItem): EntityCard | null => {
         ...card,
         songCount: null,
         followerCount: null,
-        language: toText(i.more_info?.language),
-        explicitContent: toBoolean(i.explicit_content)
+        language: toText(item.more_info?.language),
+        explicitContent: toBoolean(item.explicit_content)
       }
     default:
       return null
   }
 }
 
-export const createSearchPayload = (
-  data: z.infer<typeof SearchAPIResponseModel>
-): z.infer<typeof SearchResultModel> => ({
-  topQuery: data.topquery.data.map(topQueryToCard).filter((c): c is EntityCard => c !== null),
+export const toSearchResult = (data: z.infer<typeof SearchAPIResponseModel>): z.infer<typeof SearchResultModel> => ({
+  topQuery: data.topquery.data.map(toCard).filter((card): card is z.infer<typeof EntityCardModel> => card !== null),
   songs: data.songs.data.map(
-    (s): SongSummary => ({
+    (song): z.infer<typeof SongSummaryModel> => ({
       type: 'song',
-      id: s.id,
-      name: s.title,
-      url: s.perma_url,
-      image: createImageLinks(s.image),
-      album: toText(s.more_info?.album),
-      artists: toText(s.more_info?.primary_artists),
-      language: toText(s.more_info?.language),
-      explicitContent: toBoolean(s.explicit_content)
+      id: song.id,
+      name: song.title,
+      url: song.perma_url,
+      image: createImageLinks(song.image),
+      album: toText(song.more_info?.album),
+      artists: toArtists(undefined, song.more_info?.primary_artists),
+      language: toText(song.more_info?.language),
+      explicitContent: toBoolean(song.explicit_content)
     })
   ),
   albums: data.albums.data.map(
-    (a): AlbumSummary => ({
+    (album): z.infer<typeof AlbumSummaryModel> => ({
       type: 'album',
-      id: a.id,
-      name: a.title,
-      url: a.perma_url,
-      image: createImageLinks(a.image),
-      artist: toText(a.more_info?.music),
-      year: toText(a.more_info?.year),
+      id: album.id,
+      name: album.title,
+      url: album.perma_url,
+      image: createImageLinks(album.image),
+      artists: toArtists(undefined, album.more_info?.music),
+      year: toText(album.more_info?.year),
       songCount: null,
-      language: toText(a.more_info?.language),
-      explicitContent: toBoolean(a.explicit_content)
+      language: toText(album.more_info?.language),
+      explicitContent: toBoolean(album.explicit_content)
     })
   ),
   artists: data.artists.data.map(
-    (a): ArtistSummary => ({
+    (artist): z.infer<typeof ArtistSummaryModel> => ({
       type: 'artist',
-      id: a.id,
-      name: a.title,
+      id: artist.id,
+      name: artist.title,
       url: '',
-      image: createImageLinks(a.image),
+      image: createImageLinks(artist.image),
       role: null
     })
   ),
   playlists: data.playlists.data.map(
-    (p): PlaylistSummary => ({
+    (playlist): z.infer<typeof PlaylistSummaryModel> => ({
       type: 'playlist',
-      id: p.id,
-      name: p.title,
-      url: p.perma_url,
-      image: createImageLinks(p.image),
+      id: playlist.id,
+      name: playlist.title,
+      url: playlist.perma_url,
+      image: createImageLinks(playlist.image),
       songCount: null,
       followerCount: null,
-      language: toText(p.more_info?.language),
-      explicitContent: toBoolean(p.explicit_content)
+      language: toText(playlist.more_info?.language),
+      explicitContent: toBoolean(playlist.explicit_content)
     })
   )
 })

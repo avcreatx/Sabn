@@ -1,13 +1,52 @@
 import { createImageLinks } from '#common/helpers'
-import { safeJsonParse, toList, toNumber, toText } from '#common/utils'
-import { createAlbumPayload } from '#modules/albums/album.helper'
-import { createSongPayload } from '#modules/songs/song.helper'
-import type { ArtistMapModel, ArtistModel, RawArtistMapModel, RawArtistModel } from '#modules/artists/models'
+import { safeJsonParse, toBoolean, toList, toNumber, toText } from '#common/utils'
+import { toAlbum } from '#modules/albums/album.helper'
+import { toSong } from '#modules/songs/song.helper'
+import type {
+  ArtistMapModel,
+  ArtistModel,
+  RawArtistMapGroupModel,
+  RawArtistMapModel,
+  RawArtistModel,
+  RawArtistPlaylistModel,
+  RawSimilarArtistModel,
+  SimilarArtistModel
+} from '#modules/artists/models'
+import type { PlaylistSummaryModel } from '#modules/playlists/playlist.model'
 import type { z } from 'zod'
 
-export const createArtistPayload = (artist: z.infer<typeof RawArtistModel>): z.infer<typeof ArtistModel> => ({
+const toArtistPlaylist = (playlist: z.infer<typeof RawArtistPlaylistModel>): z.infer<typeof PlaylistSummaryModel> => ({
+  type: 'playlist',
+  id: playlist.id,
+  name: playlist.title,
+  url: playlist.perma_url,
+  image: createImageLinks(playlist.image),
+  songCount: toNumber(playlist.more_info?.song_count),
+  followerCount: null,
+  language: toText(playlist.more_info?.language),
+  explicitContent: toBoolean(playlist.explicit_content)
+})
+
+const toSimilarArtist = (similar: z.infer<typeof RawSimilarArtistModel>): z.infer<typeof SimilarArtistModel> => ({
+  id: similar.id,
+  name: similar.name,
+  url: similar.perma_url,
+  image: createImageLinks(similar.image_url),
+  type: similar.type,
+  isVerified: toBoolean(similar.isVerified),
+  dominantType: toText(similar.dominantType),
+  dob: toText(similar.dob),
+  fb: toText(similar.fb),
+  twitter: toText(similar.twitter),
+  wiki: toText(similar.wiki),
+  languages: Object.keys(safeJsonParse<Record<string, string>>(similar.languages) ?? {}),
+  isRadioPresent: similar.isRadioPresent ?? null
+})
+
+export const toArtist = (artist: z.infer<typeof RawArtistModel>): z.infer<typeof ArtistModel> => ({
   id: artist.artistId || artist.id || '',
   name: artist.name,
+  subtitle: toText(artist.subtitle),
   url: artist.urls?.overview || artist.perma_url || '',
   type: artist.type,
   followerCount: toNumber(artist.follower_count),
@@ -23,26 +62,16 @@ export const createArtistPayload = (artist: z.infer<typeof RawArtistModel>): z.i
   availableLanguages: artist.availableLanguages ?? [],
   isRadioPresent: artist.isRadioPresent || null,
   image: createImageLinks(artist.image),
-  topSongs: toList(artist.topSongs, createSongPayload),
-  topAlbums: toList(artist.topAlbums, createAlbumPayload),
-  singles: toList(artist.singles, createSongPayload),
-  latestRelease: toList(artist.latest_release, (r) => ({
-    id: r.id,
-    name: r.title,
-    type: r.type,
-    url: r.perma_url,
-    image: createImageLinks(r.image)
-  })),
-  similarArtists: toList(artist.similarArtists, (s) => ({
-    id: s.id,
-    name: s.name,
-    url: s.perma_url,
-    image: createImageLinks(s.image_url),
-    type: s.type
-  }))
+  topSongs: toList(artist.topSongs, toSong),
+  topAlbums: toList(artist.topAlbums, toAlbum),
+  singles: toList(artist.singles, toAlbum),
+  dedicatedArtistPlaylists: toList(artist.dedicated_artist_playlist, toArtistPlaylist),
+  featuredArtistPlaylists: toList(artist.featured_artist_playlist, toArtistPlaylist),
+  latestRelease: toList(artist.latest_release, toAlbum),
+  similarArtists: toList(artist.similarArtists, toSimilarArtist)
 })
 
-export const createArtistMapPayload = (artist: z.infer<typeof RawArtistMapModel>): z.infer<typeof ArtistMapModel> => ({
+export const toArtistMap = (artist: z.infer<typeof RawArtistMapModel>): z.infer<typeof ArtistMapModel> => ({
   id: artist.id,
   name: artist.name,
   role: artist.role,
@@ -50,3 +79,15 @@ export const createArtistMapPayload = (artist: z.infer<typeof RawArtistMapModel>
   type: artist.type,
   url: artist.perma_url
 })
+
+/** Card artists as objects: from `artistMap` when present (rich sources), else name-only from a joined string (lean sources). */
+export const toArtists = (
+  group: z.infer<typeof RawArtistMapGroupModel> | null | undefined,
+  names?: string | null
+): z.infer<typeof ArtistMapModel>[] => {
+  const list = group?.primary_artists?.length ? group.primary_artists : group?.artists
+  if (list?.length) return list.map(toArtistMap)
+  return names
+    ? names.split(',').map((name) => ({ id: '', name: name.trim(), role: '', type: '', url: '', image: [] }))
+    : []
+}

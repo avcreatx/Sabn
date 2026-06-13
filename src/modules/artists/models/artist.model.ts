@@ -1,12 +1,46 @@
 import { z } from 'zod'
 import { DownloadLinkModel, ImageLinkModel } from '#common/models'
 import { AlbumModel, RawAlbumModel } from '#modules/albums/album.model'
+import { PlaylistSummaryModel } from '#modules/playlists/playlist.model'
 import { RawSongModel, SongModel } from '#modules/songs/models'
+
+export const RawArtistPlaylistModel = z.object({
+  id: z.string(),
+  title: z.string(),
+  type: z.string(),
+  image: z.string().nullish(),
+  perma_url: z.string(),
+  explicit_content: z.string().nullish(),
+  more_info: z
+    .object({
+      song_count: z.string().nullish(),
+      language: z.string().nullish(),
+      firstname: z.string().nullish()
+    })
+    .nullish()
+})
+
+export const RawSimilarArtistModel = z.object({
+  id: z.string(),
+  name: z.string(),
+  perma_url: z.string(),
+  image_url: z.string().nullish(),
+  type: z.string(),
+  isVerified: z.string().nullish(),
+  dominantType: z.string().nullish(),
+  dob: z.string().nullish(),
+  fb: z.string().nullish(),
+  twitter: z.string().nullish(),
+  wiki: z.string().nullish(),
+  languages: z.string().nullish(),
+  isRadioPresent: z.boolean().nullish()
+})
 
 export const RawArtistModel = z.object({
   artistId: z.string().nullish(),
   id: z.string().nullish(),
   name: z.string(),
+  subtitle: z.string().nullish(),
   perma_url: z.string().nullish(),
   image: z.string().nullish(),
   follower_count: z.string().nullish(),
@@ -16,29 +50,11 @@ export const RawArtistModel = z.object({
   dominantType: z.string().nullish(),
   topSongs: z.array(RawSongModel).nullish(),
   topAlbums: z.array(RawAlbumModel).nullish(),
-  singles: z.array(RawSongModel).nullish(),
-  latest_release: z
-    .array(
-      z.object({
-        id: z.string(),
-        title: z.string(),
-        type: z.string(),
-        perma_url: z.string(),
-        image: z.string().nullish()
-      })
-    )
-    .nullish(),
-  similarArtists: z
-    .array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        perma_url: z.string(),
-        image_url: z.string().nullish(),
-        type: z.string()
-      })
-    )
-    .nullish(),
+  singles: z.array(RawAlbumModel).nullish(),
+  dedicated_artist_playlist: z.array(RawArtistPlaylistModel).nullish(),
+  featured_artist_playlist: z.array(RawArtistPlaylistModel).nullish(),
+  latest_release: z.array(RawAlbumModel).nullish(),
+  similarArtists: z.array(RawSimilarArtistModel).nullish(),
   isRadioPresent: z.boolean().nullish(),
   bio: z.string().nullish(),
   dob: z.string().nullish(),
@@ -58,9 +74,26 @@ export const RawArtistModel = z.object({
   fan_count: z.string().nullish()
 })
 
+export const SimilarArtistModel = z.object({
+  id: z.string(),
+  name: z.string(),
+  url: z.string(),
+  image: z.array(DownloadLinkModel),
+  type: z.string(),
+  isVerified: z.boolean(),
+  dominantType: z.string().nullable(),
+  dob: z.string().nullable(),
+  fb: z.string().nullable(),
+  twitter: z.string().nullable(),
+  wiki: z.string().nullable(),
+  languages: z.array(z.string()),
+  isRadioPresent: z.boolean().nullable()
+})
+
 export const ArtistModel = z.object({
   id: z.string(),
   name: z.string(),
+  subtitle: z.string().nullable(),
   url: z.string(),
   type: z.string(),
   image: z.array(DownloadLinkModel),
@@ -86,25 +119,11 @@ export const ArtistModel = z.object({
   isRadioPresent: z.boolean().nullable(),
   topSongs: z.array(SongModel),
   topAlbums: z.array(AlbumModel),
-  singles: z.array(SongModel),
-  latestRelease: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      type: z.string(),
-      url: z.string(),
-      image: z.array(DownloadLinkModel)
-    })
-  ),
-  similarArtists: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      url: z.string(),
-      image: z.array(DownloadLinkModel),
-      type: z.string()
-    })
-  )
+  singles: z.array(AlbumModel),
+  dedicatedArtistPlaylists: z.array(PlaylistSummaryModel),
+  featuredArtistPlaylists: z.array(PlaylistSummaryModel),
+  latestRelease: z.array(AlbumModel),
+  similarArtists: z.array(SimilarArtistModel)
 })
 
 export const ArtistSummaryModel = z.object({
