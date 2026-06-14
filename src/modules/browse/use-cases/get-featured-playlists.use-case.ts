@@ -11,10 +11,12 @@ export class GetFeaturedPlaylistsUseCase extends useCase(paginated(PlaylistSumma
   async execute({ page, limit }: z.infer<typeof PaginationQuery>) {
     const data = await useFetch({
       endpoint: Endpoints.browse.featuredPlaylists,
-      params: { p: page, n: limit },
+      params: { p: page - 1, n: limit }, // upstream is 0-indexed; our API is 1-indexed
       schema: FeaturedPlaylistsAPIResponseModel
     })
 
-    return toPage(data.data.map(toPlaylistSummary), { page, limit, total: data.count ?? data.data.length })
+    const items = data.data ?? []
+
+    return toPage(items.map(toPlaylistSummary), { page, limit, total: data.count })
   }
 }

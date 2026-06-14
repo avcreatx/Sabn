@@ -26,6 +26,12 @@ describe('useFetch', () => {
     expect(data).toEqual({ id: 1 })
   })
 
+  it('labels a root-level drift issue when the top-level type is wrong', async () => {
+    stubFetch(() => Response.json([], { status: 200 }))
+    const data = await useFetch({ endpoint: 'x', params: {}, schema: z.object({ id: z.string() }) })
+    expect(data).toEqual([])
+  })
+
   it('throws when the response is not ok', async () => {
     stubFetch(() => new Response('err', { status: 500 }))
     await expect(useFetch({ endpoint: 'x', params: {} })).rejects.toThrow(HTTPException)

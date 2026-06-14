@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { assertFound, useFetch } from '#common/helpers'
@@ -13,11 +12,9 @@ export class GetAlbumByLinkUseCase extends useCase(AlbumModel) {
         token,
         type: 'album'
       },
-      schema: z.union([RawAlbumModel, z.array(RawAlbumModel)])
+      schema: RawAlbumModel
     })
 
-    const entity = Array.isArray(data) ? data[0] : data
-
-    return toAlbum(assertFound(entity, 'title', 'album not found'))
+    return toAlbum(assertFound(data, 'title', 'album not found'))
   }
 }

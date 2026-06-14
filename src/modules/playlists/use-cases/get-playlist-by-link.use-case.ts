@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { assertFound, useFetch } from '#common/helpers'
@@ -13,24 +12,20 @@ export interface GetPlaylistByLinkArgs {
 
 export class GetPlaylistByLinkUseCase extends useCase(PlaylistModel) {
   async execute({ token, limit, page }: GetPlaylistByLinkArgs) {
+    // Upstream ignores the page param, so over-fetch up to the requested page and slice it client-side.
     const data = await useFetch({
       endpoint: Endpoints.playlists.link,
       params: {
         token,
-        n: limit,
-        p: page,
+        n: page * limit,
         type: 'playlist'
       },
-      schema: z.union([RawPlaylistModel, z.array(RawPlaylistModel)])
+      schema: RawPlaylistModel
     })
 
-    const entity = Array.isArray(data) ? data[0] : data
-    const playlist = toPlaylist(assertFound(entity, 'title', 'playlist not found'))
+    const playlist = toPlaylist(assertFound(data, 'title', 'playlist not found'))
+    const start = (page - 1) * limit
 
-    return {
-      ...playlist,
-      songCount: playlist.songs.length || null,
-      songs: playlist.songs.slice(0, limit)
-    }
+    return { ...playlist, songs: playlist.songs.slice(start, start + limit) }
   }
 }

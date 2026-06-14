@@ -20,6 +20,16 @@ describe('GetPlaylistById', () => {
     expect(() => PlaylistModel.parse(playlist)).not.toThrow()
   })
 
+  // Upstream ignores the page param; the use-case over-fetches and slices, so page 2 must differ.
+  it('should paginate songs — page 2 differs from page 1', async () => {
+    const page1 = await getPlaylistByIdUseCase.execute({ id: '82914609', page: 1, limit: 5 })
+    const page2 = await getPlaylistByIdUseCase.execute({ id: '82914609', page: 2, limit: 5 })
+
+    expect(page1.songs).toHaveLength(5)
+    expect(page2.songs).toHaveLength(5)
+    expect(page2.songs[0]?.id).not.toBe(page1.songs[0]?.id)
+  })
+
   it('should throw 404 for an unknown playlist id', async () => {
     await expect(getPlaylistByIdUseCase.execute({ id: 'random-no-id', page: 1, limit: 5 })).rejects.toThrow(
       HTTPException

@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
 import { assertFound, useFetch } from '#common/helpers'
@@ -27,11 +26,9 @@ export class GetArtistByLinkUseCase extends useCase(ArtistModel) {
         category: sortBy,
         type: 'artist'
       },
-      schema: z.union([RawArtistModel, z.array(RawArtistModel)])
+      schema: RawArtistModel
     })
 
-    const entity = Array.isArray(data) ? data[0] : data
-
-    return toArtist(assertFound(entity, 'name', 'artist not found'))
+    return toArtist(assertFound(data, 'name', 'artist not found'))
   }
 }

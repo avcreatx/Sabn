@@ -47,7 +47,7 @@ export const LaunchDataAPIResponseModel = z.object({
 })
 
 export const FeaturedPlaylistsAPIResponseModel = z.object({
-  data: z.array(FeedItemAPIResponseModel),
+  data: z.array(FeedItemAPIResponseModel).nullish(),
   count: z.number().nullish(),
   last_page: z.boolean().nullish()
 })
