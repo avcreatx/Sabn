@@ -21,13 +21,13 @@ describe('GetFeaturedPlaylists', () => {
     const page1 = await getFeaturedPlaylistsUseCase.execute({ page: 1, limit: 5 })
     const page2 = await getFeaturedPlaylistsUseCase.execute({ page: 2, limit: 5 })
 
-    expect(page1.results[0]?.id).not.toBe(page2.results[0]?.id)
+    expect(page1.items[0]?.id).not.toBe(page2.items[0]?.id)
   })
 
   // An out-of-range page returns `{ data: null }`, which must degrade to an empty page, not crash.
   it('should return an empty page for an out-of-range page', async () => {
     const playlists = await getFeaturedPlaylistsUseCase.execute({ page: 999, limit: 10 })
 
-    expect(playlists.results).toEqual([])
+    expect(playlists.items).toEqual([])
   })
 })

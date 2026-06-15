@@ -19,11 +19,11 @@ export const errorResponses = {
 }
 
 export const toPage = <T>(
-  results: T[],
+  items: T[],
   args: { page: number; limit: number; total?: number | null }
-): { total: number; page: number; limit: number; results: T[] } => ({
-  total: args.total ?? results.length,
+): { total: number; page: number; limit: number; items: T[] } => ({
+  total: args.total ?? items.length,
   page: args.page,
   limit: args.limit,
-  results
+  items
 })

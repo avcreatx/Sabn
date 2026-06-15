@@ -6,4 +6,4 @@ export const PaginationQuery = z.object({
 })
 
 export const paginated = <ItemSchema extends z.ZodTypeAny>(item: ItemSchema) =>
-  z.object({ total: z.number(), page: z.number(), limit: z.number(), results: z.array(item) })
+  z.object({ total: z.number(), page: z.number(), limit: z.number(), items: z.array(item) })
