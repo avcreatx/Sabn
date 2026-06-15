@@ -1,6 +1,6 @@
 import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
-import { assertFound, useFetch } from '#common/helpers'
+import { useFetch } from '#common/helpers'
 import { toPlaylist } from '#modules/playlists/playlist.helper'
 import { PlaylistModel, RawPlaylistModel } from '#modules/playlists/playlist.model'
 
@@ -20,10 +20,11 @@ export class GetPlaylistByLinkUseCase extends useCase(PlaylistModel) {
         n: page * limit,
         type: 'playlist'
       },
-      schema: RawPlaylistModel
+      schema: RawPlaylistModel,
+      notFound: { key: 'title', message: 'playlist not found' }
     })
 
-    const playlist = toPlaylist(assertFound(data, 'title', 'playlist not found'))
+    const playlist = toPlaylist(data)
     const start = (page - 1) * limit
 
     return { ...playlist, songs: playlist.songs.slice(start, start + limit) }

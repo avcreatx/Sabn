@@ -12,6 +12,9 @@ interface FetchParams<T> {
   context?: ApiContextEnum
   schema?: z.ZodType<T>
   timeout?: number
+  // The entity is "not found" when this key is empty/absent on the raw body. Checked BEFORE schema
+  // validation, so a not-found response 404s instead of tripping soft-validation drift.
+  notFound?: { key: keyof T; message: string }
 }
 
 const JIOSAAVN_API_URL = 'https://www.jiosaavn.com/api.php'
@@ -33,7 +36,7 @@ const request = async (url: URL, timeout: number): Promise<Response> => {
 }
 
 export const useFetch = async <T>(args: FetchParams<T>): Promise<T> => {
-  const { endpoint, params, context, schema, timeout = DEFAULT_TIMEOUT_MS } = args
+  const { endpoint, params, context, schema, timeout = DEFAULT_TIMEOUT_MS, notFound } = args
 
   const url = new URL(JIOSAAVN_API_URL)
   const ctx = context ?? 'web6dot0'
@@ -50,6 +53,8 @@ export const useFetch = async <T>(args: FetchParams<T>): Promise<T> => {
   const body = await response.json().catch(() => {
     throw new HTTPException(502, { message: 'JioSaavn returned a non-JSON response' })
   })
+
+  if (notFound && !(body as T)[notFound.key]) throw new HTTPException(404, { message: notFound.message })
 
   if (schema) {
     const { success, data, error } = schema.safeParse(body)

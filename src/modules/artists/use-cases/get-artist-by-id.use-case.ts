@@ -1,6 +1,6 @@
 import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
-import { assertFound, useFetch } from '#common/helpers'
+import { useFetch } from '#common/helpers'
 import { toArtist } from '#modules/artists/artist.helper'
 import { ArtistModel, RawArtistModel } from '#modules/artists/models'
 
@@ -25,9 +25,10 @@ export class GetArtistByIdUseCase extends useCase(ArtistModel) {
         sort_order: sortOrder,
         category: sortBy
       },
-      schema: RawArtistModel
+      schema: RawArtistModel,
+      notFound: { key: 'name', message: 'artist not found' }
     })
 
-    return toArtist(assertFound(data, 'name', 'artist not found'))
+    return toArtist(data)
   }
 }

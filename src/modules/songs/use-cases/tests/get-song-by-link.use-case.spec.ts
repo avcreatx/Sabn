@@ -16,7 +16,13 @@ describe('GetSongByLink', () => {
     expect(() => SongModel.parse(song[0])).not.toThrow()
   })
 
-  it('should throw 404 error when song is not found', async () => {
+  // A garbage token returns a bare `[]` (array branch); an empty token returns an `{ error }` object
+  // with no `songs` (object branch) — together they cover both arms of the not-found normalization.
+  it('should throw 404 for a garbage token', async () => {
     await expect(getSongByLinkUseCase.execute('invalid-link')).rejects.toThrow(HTTPException)
+  })
+
+  it('should throw 404 for an empty token', async () => {
+    await expect(getSongByLinkUseCase.execute('')).rejects.toThrow(HTTPException)
   })
 })

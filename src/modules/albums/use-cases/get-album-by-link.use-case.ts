@@ -1,6 +1,6 @@
 import { useCase } from '#common/classes'
 import { Endpoints } from '#common/constants'
-import { assertFound, useFetch } from '#common/helpers'
+import { useFetch } from '#common/helpers'
 import { toAlbum } from '#modules/albums/album.helper'
 import { AlbumModel, RawAlbumModel } from '#modules/albums/album.model'
 
@@ -12,9 +12,10 @@ export class GetAlbumByLinkUseCase extends useCase(AlbumModel) {
         token,
         type: 'album'
       },
-      schema: RawAlbumModel
+      schema: RawAlbumModel,
+      notFound: { key: 'title', message: 'album not found' }
     })
 
-    return toAlbum(assertFound(data, 'title', 'album not found'))
+    return toAlbum(data)
   }
 }

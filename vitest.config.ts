@@ -7,9 +7,9 @@ export default defineConfig({
     testTimeout: 30000,
     retry: 3,
     coverage: {
-      enabled: false, // TODO: enable coverage once all tests are passing
+      enabled: true,
       include: ['src/common', 'src/modules'],
-      exclude: ['src/common/types/**'],
+      exclude: ['src/common/types/**', '**/index.ts', '**/*.service.ts'],
       provider: 'v8',
       thresholds: {
         statements: 100,
