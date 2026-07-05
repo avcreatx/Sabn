@@ -21,6 +21,37 @@ export const Meteors = ({ number }: { number: number }) => {
   )
 }
 
+// Floating Music Instruments Component
+export const FloatingMusicBackground = () => {
+  const instruments = [
+    { icon: '🎵', size: 'text-4xl', delay: '0s', duration: '12s', top: '15%', left: '10%' },
+    { icon: '🎸', size: 'text-5xl', delay: '2s', duration: '15s', top: '45%', left: '85%' },
+    { icon: '🎧', size: 'text-4xl', delay: '4s', duration: '18s', top: '75%', left: '20%' },
+    { icon: '🎶', size: 'text-3xl', delay: '1s', duration: '14s', top: '25%', left: '75%' },
+    { icon: '🎤', size: 'text-5xl', delay: '5s', duration: '16s', top: '65%', left: '80%' },
+    { icon: '🎹', size: 'text-4xl', delay: '3s', duration: '20s', top: '80%', left: '60%' },
+  ]
+
+  return (
+    <div class="absolute inset-0 pointer-events-none overflow-hidden select-none z-0 min-h-screen">
+      {instruments.map((inst, idx) => (
+        <div
+          key={idx}
+          class={`${inst.size} absolute opacity-15 blur-[1px] animate-[floatAnimation_linear_infinite]`}
+          style={{
+            top: inst.top,
+            left: inst.left,
+            animationDelay: inst.delay,
+            animationDuration: inst.duration,
+          }}
+        >
+          {inst.icon}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 Home.get('/', (c) => {
   const title = 'JioSaavn API'
   const description =
@@ -56,12 +87,13 @@ Home.get('/', (c) => {
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@700&display=swap" rel="stylesheet" />
         <script src="https://cdn.tailwindcss.com" />
         <style
           dangerouslySetInnerHTML={{
             __html: `
             * { font-family: 'Inter', sans-serif; } 
+            .stylish-blink { font-family: 'Orbitron', sans-serif; }
             @keyframes borderAnimation {
               0%, 100% { background-position: 0% 50%; }
               50% { background-position: 100% 50%; }
@@ -70,6 +102,15 @@ Home.get('/', (c) => {
               0% { transform: rotate(215deg) translateX(0); opacity: 1; }
               70% { opacity: 1; }
               100% { transform: rotate(215deg) translateX(-500px); opacity: 0; }
+            }
+            @keyframes textBlink {
+              0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(168,85,247,0.6), 0 0 20px rgba(168,85,247,0.4); }
+              50% { opacity: 0.4; text-shadow: 0 0 2px rgba(168,85,247,0.1); }
+            }
+            @keyframes floatAnimation {
+              0% { transform: translateY(0px) rotate(0deg); }
+              50% { transform: translateY(-25px) rotate(10deg); }
+              100% { transform: translateY(0px) rotate(0deg); }
             }
             .meteor::before {
               content: '';
@@ -86,8 +127,11 @@ Home.get('/', (c) => {
           }}
         />
       </head>
-      <body class="bg-black mx-auto md:min-h-screen max-w-screen-lg flex flex-col">
-        <main class="mx-auto my-auto flex flex-col space-y-8 px-4 pb-8 md:py-10 relative overflow-y-hidden overflow-x-hidden">
+      <body class="bg-black mx-auto md:min-h-screen max-w-screen-lg flex flex-col relative overflow-x-hidden">
+        {/* Floating Background Effects */}
+        <FloatingMusicBackground />
+        
+        <main class="mx-auto my-auto flex flex-col space-y-8 px-4 pb-8 md:py-10 relative overflow-y-hidden overflow-x-hidden z-10 w-full">
           <Meteors number={15} />
 
           <div class="flex flex-row items-center space-x-4 ml-6">
@@ -164,36 +208,36 @@ Home.get('/', (c) => {
             <div class="p-4 sm:p-8 hover:bg-opacity-5 hover:bg-white rounded-lg duration-100 sm:col-span-4">
               <div class="flex flex-col">
                 <span class="text-xs uppercase bg-opacity-15 rounded text-center max-w-fit px-2 py-1 font-bold tracking-wide bg-blue-500 text-blue-500">
-                  Contact
+                  Developer
                 </span>
-                <span class="text-neutral-200 font-bold text-lg sm:text-xl md:text-2xl mt-2">Sumit Kolhe</span>
-                <div class="text-neutral-500 mt-2">
-                  Have a question or need help? Reach out on{' '}
+                <span class="text-neutral-200 font-bold text-lg sm:text-xl md:text-2xl mt-2">
+                  <span class="stylish-blink text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 animate-[textBlink_2s_linear_infinite]">Mirrykal</span> & Sumit Kolhe
+                </span>
+                <div class="text-neutral-500 mt-3 flex flex-col space-y-2">
+                  {/* YouTube Button */}
                   <a
-                    href="https://github.com/sumitkolhe"
+                    href="https://youtube.com/@mirrykal"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:underline text-indigo-500"
+                    class="flex items-center space-x-2 bg-red-600/10 border border-red-600/30 hover:bg-red-600/20 text-red-400 px-3 py-1.5 rounded-md duration-150 max-w-fit"
                   >
-                    GitHub
+                    <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                    <span class="text-sm font-semibold">@mirrykal</span>
                   </a>
-                  ,{' '}
+
+                  {/* Facebook Button */}
                   <a
-                    href="https://twitter.com/thesumitkolhe"
+                    href="https://fb.me/arun.x76"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:underline text-sky-500"
+                    class="flex items-center space-x-2 bg-blue-600/10 border border-blue-600/30 hover:bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-md duration-150 max-w-fit"
                   >
-                    Twitter
-                  </a>
-                  , or{' '}
-                  <a
-                    href="https://t.me/sumitkolhe"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline text-pink-500"
-                  >
-                    Telegram.
+                    <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    <span class="text-sm font-semibold">Arun Kumar</span>
                   </a>
                 </div>
               </div>
